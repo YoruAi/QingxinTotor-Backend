@@ -13,6 +13,8 @@ TechStack:
 
 - backend: Java SpringBoot, MyBatis, MySQL
 
+**See frontend**: https://github.com/YoruAi/QingxinTutor-Frontend
+
 **See api docs**: https://documenter.getpostman.com/view/38185893/2sB3dHXDkL
 
 See DB Design in database.sql.
