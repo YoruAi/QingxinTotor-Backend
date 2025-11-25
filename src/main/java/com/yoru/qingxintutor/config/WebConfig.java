@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.resource.EncodedResourceResolver;
@@ -36,11 +37,14 @@ public class WebConfig implements WebMvcConfigurer {
             this.allowedBasePath = Paths.get(baseDir).toAbsolutePath().normalize();
         }
 
-        @NonNull
+        @SuppressWarnings("NullableProblems")
+        @Nullable
         @Override
         protected Resource getResource(@NonNull String resourcePath, @NonNull Resource location) throws IOException {
             Resource resolved = super.getResource(resourcePath, location);
-            if (!resolved.exists()) throw new FileNotFoundException("Access denied, wrong path to avatar file");
+            //noinspection ConstantValue
+            if (resolved == null || !resolved.exists())
+                throw new FileNotFoundException("Access denied, wrong path to avatar file");
 
             Path resolvedPath = resolved.getFile().toPath().normalize();
 

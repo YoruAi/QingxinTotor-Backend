@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.FileNotFoundException;
 
@@ -43,12 +44,6 @@ public class GlobalExceptionHandler {
         return ApiResult.error(e.getMessage());
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(FileNotFoundException.class)
-    public ApiResult<Void> handleFileNotFoundErrors(FileNotFoundException e) {
-        return ApiResult.error("Resource not exists");
-    }
-
     // 路径变量或请求参数类型转换失败
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({BindException.class, TypeMismatchException.class})
@@ -68,11 +63,17 @@ public class GlobalExceptionHandler {
     public ApiResult<Void> handleNotFound(NoHandlerFoundException e) {
         return ApiResult.error("Request URL not exists");
     }
-    
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({FileNotFoundException.class, NoResourceFoundException.class})
+    public ApiResult<Void> handleFileNotFoundErrors(Exception e) {
+        return ApiResult.error("Resource not exists");
+    }
+
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ApiResult<Void> handleGeneric(Exception e) {
-        log.error("Unexpected error: {}", e.getMessage());
+        log.error("Unexpected error: {}", e.getMessage(), e);
         return ApiResult.error("An unexpected error occurred! Please contact to admin.");
     }
 }
