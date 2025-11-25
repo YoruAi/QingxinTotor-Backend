@@ -15,7 +15,7 @@ TechStack:
 
 **See api docs**: https://documenter.getpostman.com/view/38185893/2sB3dHXDkL
 
-See DB Design in QingxinTutor.sql.
+See DB Design in database.sql.
 
 All entities are in com.yoru.qingxintutor.pojo.
 
