@@ -4,7 +4,6 @@ import com.yoru.qingxintutor.pojo.ApiResult;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -26,7 +25,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({IllegalArgumentException.class, BusinessException.class})
     public ApiResult<Void> handleIllegalArgument(Exception e) {
-        log.warn("Request with invalid argument: {}", e.getMessage());
+        log.warn("Request with invalid argument(custom define): {}", e.getMessage());
         return ApiResult.error(e.getMessage());
     }
 
@@ -34,13 +33,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ApiResult<Void> handleValidationErrors(MethodArgumentNotValidException e) {
-        String errorMessage = e.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+        String errorMessage = e.getBindingResult().getFieldErrors().stream()
                 .findFirst()
+                .map(fieldError -> {
+                    return "Invalid request format";
+                })
                 .orElse("Invalid input");
-        log.warn("Request with invalid POST argument: {}", errorMessage);
+        log.warn("Request with invalid argument: {}", errorMessage);
         return ApiResult.error(errorMessage);
     }
 
