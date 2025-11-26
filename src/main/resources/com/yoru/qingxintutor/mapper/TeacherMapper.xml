@@ -11,6 +11,7 @@
 
     <resultMap id="TeacherResultMap" type="com.yoru.qingxintutor.pojo.entity.TeacherEntity">
         <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
         <result property="phone" column="phone"/>
         <result property="nickname" column="nickname"/>
         <result property="name" column="name"/>
@@ -31,6 +32,9 @@
         INSERT INTO
         <include refid="tableName"/>
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null and userId != ''">
+                user_id,
+            </if>
             <if test="phone != null and phone != ''">
                 phone,
             </if>
@@ -69,6 +73,9 @@
             </if>
         </trim>
         <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="userId != null and userId != ''">
+                #{userId},
+            </if>
             <if test="phone != null and phone != ''">
                 #{phone},
             </if>
@@ -368,5 +375,23 @@
                 AND t.gender = #{gender}
             </if>
         </where>
+    </select>
+
+    <select id="findByUserId" resultMap="TeacherInfoResultMap">
+        SELECT
+        <include refid="teacherInfoColumns"/>
+        FROM teacher t
+        <include refid="avgRatingSubQuery"/>
+        <include refid="subjectJoin"/>
+        WHERE t.user_id = #{userId}
+    </select>
+
+    <select id="findTeacherIdByUserId" resultType="java.lang.Long">
+        SELECT
+        t.id
+        FROM teacher t
+        <include refid="avgRatingSubQuery"/>
+        <include refid="subjectJoin"/>
+        WHERE t.user_id = #{userId}
     </select>
 </mapper>

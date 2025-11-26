@@ -18,6 +18,7 @@
         icon,
         address,
         passwd_hash,
+        role,
         create_time,
         update_time
     </sql>
@@ -30,6 +31,7 @@
         <result property="icon" column="icon"/>
         <result property="address" column="address"/>
         <result property="passwdHash" column="passwd_hash"/>
+        <result property="role" column="role"/>
         <result property="createTime" column="create_time"/>
         <result property="updateTime" column="update_time"/>
     </resultMap>
@@ -103,6 +105,9 @@
             <if test="passwdHash != null and passwdHash != ''">
                 passwd_hash,
             </if>
+            <if test="role != null">
+                role,
+            </if>
             <if test="createTime != null">
                 create_time,
             </if>
@@ -131,6 +136,9 @@
             </if>
             <if test="passwdHash != null and passwdHash != ''">
                 #{passwdHash},
+            </if>
+            <if test="role != null">
+                #{role},
             </if>
             <if test="createTime != null">
                 #{createTime},

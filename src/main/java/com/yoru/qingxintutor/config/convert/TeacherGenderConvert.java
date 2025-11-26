@@ -6,17 +6,16 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TeacherGenderConvert implements Converter<String, TeacherEntity.Gender> {
-    @SuppressWarnings("NullableProblems")
+    @SuppressWarnings({"NullableProblems", "ConstantValue"})
     @Override
     public TeacherEntity.Gender convert(String source) {
-        //noinspection ConstantValue
         if (source == null || source.isBlank()) {
             return null;
         }
         try {
             return TeacherEntity.Gender.valueOf(source.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Invalid gender value");
         }
     }
 }

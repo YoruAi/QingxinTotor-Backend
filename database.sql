@@ -5,15 +5,16 @@ USE db_qingxin_tutor;
 -- 1. user 用户表
 CREATE TABLE user
 (
-    id          CHAR(36) PRIMARY KEY  DEFAULT (UUID()),
-    username    VARCHAR(50)  NOT NULL UNIQUE,
+    id          CHAR(36) PRIMARY KEY                 DEFAULT (UUID()),
+    username    VARCHAR(50)                 NOT NULL UNIQUE,
     nickname    VARCHAR(50),
-    email       VARCHAR(100) NOT NULL UNIQUE,
-    icon        VARCHAR(255),          -- should starts with "avatar/"
+    email       VARCHAR(100)                NOT NULL UNIQUE,
+    icon        VARCHAR(255),                         -- should starts with "avatar/"
     address     VARCHAR(255),
-    passwd_hash VARCHAR(255) NOT NULL, -- hashed
-    create_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    update_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    passwd_hash VARCHAR(255)                NOT NULL, -- hashed
+    role        ENUM ('STUDENT', 'TEACHER') NOT NULL DEFAULT 'STUDENT',
+    create_time DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -33,6 +34,7 @@ CREATE TABLE email_verification_code
 CREATE TABLE teacher
 (
     id                  BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id             CHAR(36)                NOT NULL UNIQUE,
     phone               VARCHAR(20)             NOT NULL UNIQUE,
     nickname            VARCHAR(50),
     name                VARCHAR(50)             NOT NULL,
@@ -190,17 +192,10 @@ CREATE TABLE forum_message
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
     forum_id    BIGINT   NOT NULL,
     user_id     CHAR(36),
-    teacher_id  BIGINT,
     content     TEXT     NOT NULL,
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_forum_id (forum_id),
-    INDEX idx_create_time (create_time),
-    CONSTRAINT chk_user_or_teacher
-        CHECK (
-            (user_id IS NOT NULL AND teacher_id IS NULL)
-                OR
-            (user_id IS NULL AND teacher_id IS NOT NULL)
-            )
+    INDEX idx_create_time (create_time)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -240,7 +235,7 @@ TRUNCATE TABLE notification;
 -- DANGEROUS ZONE --
 
 
--- 测试样例
+-- 测试样例 --
 -- 1. 插入科目
 INSERT INTO subject (subject_name, description)
 VALUES ('数学', '中小学数学课程'),
@@ -250,14 +245,29 @@ VALUES ('数学', '中小学数学课程'),
        ('语文', '中小学语文阅读与写作');
 
 -- 2. 插入教师（注意 icon 格式）
-INSERT INTO teacher (phone, nickname, name, gender, birth_date, icon, address, teaching_experience, description, grade)
-VALUES ('13800138001', '张老师', '张伟', 'MALE', '1985-03-12', '/avatar/13800138001.png', '北京市海淀区',
+INSERT INTO user (id, username, nickname, email, address, passwd_hash, role)
+VALUES ('e0b78abe-d6fd-4e95-92e5-cb3aa150a428', '张伟', '张老师', 'QXTutorZhangWei@163.com', '北京市海淀区',
+        '$2a$10$UPEuODQp2UoMBEah8eHHI.N81wy/wFlQp8tIFavFWy6fZiNY9a39G', 'TEACHER'),
+       ('0bfacca0-65c2-4c64-83a3-49c89468b07f', '李娜', '李老师', 'QXTutorLiNa@163.com', '上海市浦东新区',
+        '$2a$10$VxgRR.tFHYs./jh2TVx.oe.j3hhlW2JM0sH66XJtqehGuJ4NvqQ9W', 'TEACHER'),
+       ('4beb6621-97de-4b41-901c-389a4bbfb4f1', '王强', '王老师', 'QXTutorWangQiang@163.com', '广州市天河区',
+        '$2a$10$ibCrERy77Je8Y0doJbgBJ.enKTTrJoh1e.TjzfdefS3EAZCELLLJS', 'TEACHER'),
+       ('5b92739f-b0cd-4098-af68-f8ca83d3187f', '陈芳', '陈老师', 'QXTutorChenFang@163.com', '深圳市南山区',
+        '$2a$10$TVt8r2KrbYjrnB/famJpBev5Sp5S38cWm45FRf4dihT1NBmpVTW6W', 'TEACHER')
+;
+INSERT INTO teacher (user_id, phone, nickname, name, gender, birth_date, icon, address, teaching_experience,
+                     description, grade)
+VALUES ('36418c97-ab09-4f8a-8a0c-52c549c42fb2', '13800138001', '张老师', '张伟', 'MALE', '1985-03-12',
+        '/avatar/13800138001.png', '北京市海淀区',
         '10年高中数学教学经验，擅长高考压轴题讲解。', '耐心细致，注重思维训练。', 9),
-       ('13800138002', '李老师', '李娜', 'FEMALE', '1990-07-25', '/avatar/13800138002.png', '上海市浦东新区',
+       ('36418c97-ab09-4f8a-8a0c-52c549c42fb3', '13800138002', '李老师', '李娜', 'FEMALE', '1990-07-25',
+        '/avatar/13800138002.png', '上海市浦东新区',
         '8年初中英语教学，雅思7.5分。', '课堂生动有趣，提升学生兴趣。', 7),
-       ('13800138003', '王老师', '王强', 'MALE', '1988-11-30', '/avatar/13800138003.png', '广州市天河区',
+       ('36418c97-ab09-4f8a-8a0c-52c549c42fb4', '13800138003', '王老师', '王强', 'MALE', '1988-11-30',
+        '/avatar/13800138003.png', '广州市天河区',
         '6年物理竞赛辅导经验。', '逻辑清晰，擅长实验教学。', 8),
-       ('13800138004', '陈老师', '陈芳', 'FEMALE', '1992-01-15', '/avatar/13800138004.png', '深圳市南山区',
+       ('36418c97-ab09-4f8a-8a0c-52c549c42fb5', '13800138004', '陈老师', '陈芳', 'FEMALE', '1992-01-15',
+        '/avatar/13800138004.png', '深圳市南山区',
         '5年化学教学，熟悉新课标。', '善于联系生活实际讲解抽象概念。', 6);
 
 -- 3. 获取教师ID并关联科目（假设自增ID从1开始）
@@ -278,12 +288,12 @@ VALUES ('学习交流', '讨论学习方法、解题技巧'),
        ('意见反馈交流', '对平台功能提出建议并交流');
 
 -- 5. 插入论坛消息（仅教师发布，user_id = NULL, teacher_id = 对应ID）
-INSERT INTO forum_message (forum_id, user_id, teacher_id, content)
-VALUES (1, NULL, 1, '大家好！我是张老师，欢迎在本板块提问数学难题，我会定期解答。'),
-       (1, NULL, 2, '英语学习重在坚持！推荐每天背10个单词+听一段听力。'),
-       (2, NULL, 3, '本周物理实验课资料已上传，请同学们提前预习。'),
-       (2, NULL, 4, '化学方程式配平技巧：先看氧，再看氢，最后调整金属元素。'),
-       (3, NULL, 1, '建议增加错题本功能，方便学生复习。');
+INSERT INTO forum_message (forum_id, user_id, content)
+VALUES (1, '36418c97-ab09-4f8a-8a0c-52c549c42fb2', '大家好！我是张老师，欢迎在本板块提问数学难题，我会定期解答。'),
+       (1, '36418c97-ab09-4f8a-8a0c-52c549c42fb3', '英语学习重在坚持！推荐每天背10个单词+听一段听力。'),
+       (2, '36418c97-ab09-4f8a-8a0c-52c549c42fb4', '本周物理实验课资料已上传，请同学们提前预习。'),
+       (2, '36418c97-ab09-4f8a-8a0c-52c549c42fb5', '化学方程式配平技巧：先看氧，再看氢，最后调整金属元素。'),
+       (3, '36418c97-ab09-4f8a-8a0c-52c549c42fb2', '建议增加错题本功能，方便学生复习。');
 
 -- 6. 插入全站通知（user_id = NULL）
 INSERT INTO notification (user_id, title, content)

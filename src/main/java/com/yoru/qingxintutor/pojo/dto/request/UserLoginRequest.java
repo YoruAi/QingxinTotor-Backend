@@ -3,6 +3,7 @@ package com.yoru.qingxintutor.pojo.dto.request;
 import com.yoru.qingxintutor.annotation.ValidTimestamp;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.util.StringUtils;
@@ -28,6 +29,7 @@ public class UserLoginRequest {
     private String code;
 
     // 防重放
+    @NotNull(message = "Invalid timestamp")
     @ValidTimestamp
     private Instant timestamp;
 

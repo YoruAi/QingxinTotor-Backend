@@ -1,15 +1,11 @@
 package com.yoru.qingxintutor.controller;
 
-import com.yoru.qingxintutor.enums.EmailPurpose;
 import com.yoru.qingxintutor.exception.BusinessException;
 import com.yoru.qingxintutor.pojo.ApiResult;
-import com.yoru.qingxintutor.pojo.dto.request.UserLoginRequest;
-import com.yoru.qingxintutor.pojo.dto.request.UserRegisterRequest;
-import com.yoru.qingxintutor.pojo.dto.request.UserResetPasswordRequest;
-import com.yoru.qingxintutor.pojo.dto.request.UserSendCodeRequest;
+import com.yoru.qingxintutor.pojo.dto.request.*;
 import com.yoru.qingxintutor.pojo.dto.response.UserAuthResponse;
 import com.yoru.qingxintutor.pojo.result.UserAuthResult;
-import com.yoru.qingxintutor.service.UserService;
+import com.yoru.qingxintutor.service.AuthService;
 import com.yoru.qingxintutor.service.VerificationCodeService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -25,21 +21,38 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     @Autowired
-    private UserService userService;
+    private AuthService authService;
 
     @Autowired
     private VerificationCodeService verificationCodeService;
 
-    @PostMapping("/register")
-    public ApiResult<UserAuthResponse> register(@Valid @RequestBody UserRegisterRequest userRegisterRequest)
+    @PostMapping("/register-user")
+    public ApiResult<UserAuthResponse> registerStudent(@Valid @RequestBody UserRegisterRequest userRegisterRequest)
             throws BusinessException {
-        UserAuthResult userAuthResult = userService.register(userRegisterRequest);
+        UserAuthResult userAuthResult = authService.registerStudent(userRegisterRequest);
         UserAuthResponse userAuthResponse = UserAuthResponse.builder()
                 .expireIn(userAuthResult.getExpireIn())
                 .token(userAuthResult.getToken())
                 .user(UserAuthResponse.AuthedUser.builder()
                         .id(userAuthResult.getUserId())
                         .username(userAuthResult.getUsername())
+                        .role(userAuthResult.getUserRole())
+                        .build())
+                .build();
+        return ApiResult.success(userAuthResponse);
+    }
+
+    @PostMapping("/register-teacher")
+    public ApiResult<UserAuthResponse> registerStudent(@Valid @RequestBody TeacherRegisterRequest teacherRegisterRequest)
+            throws BusinessException {
+        UserAuthResult userAuthResult = authService.registerTeacher(teacherRegisterRequest);
+        UserAuthResponse userAuthResponse = UserAuthResponse.builder()
+                .expireIn(userAuthResult.getExpireIn())
+                .token(userAuthResult.getToken())
+                .user(UserAuthResponse.AuthedUser.builder()
+                        .id(userAuthResult.getUserId())
+                        .username(userAuthResult.getUsername())
+                        .role(userAuthResult.getUserRole())
                         .build())
                 .build();
         return ApiResult.success(userAuthResponse);
@@ -48,13 +61,14 @@ public class AuthController {
     @PostMapping("/login")
     public ApiResult<UserAuthResponse> login(@Valid @RequestBody UserLoginRequest userLoginRequest)
             throws BusinessException {
-        UserAuthResult userAuthResult = userService.login(userLoginRequest);
+        UserAuthResult userAuthResult = authService.login(userLoginRequest);
         UserAuthResponse response = UserAuthResponse.builder()
                 .token(userAuthResult.getToken())
                 .expireIn(userAuthResult.getExpireIn())
                 .user(UserAuthResponse.AuthedUser.builder()
                         .id(userAuthResult.getUserId())
                         .username(userAuthResult.getUsername())
+                        .role(userAuthResult.getUserRole())
                         .build())
                 .build();
         return ApiResult.success(response);
@@ -63,29 +77,14 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ApiResult<UserAuthResponse> resetPassword(@Valid @RequestBody UserResetPasswordRequest userResetPasswordRequest)
             throws BusinessException {
-        userService.resetPassword(userResetPasswordRequest);
+        authService.resetPassword(userResetPasswordRequest);
         return ApiResult.success();
     }
 
-
-    @PostMapping("/send-login-code")
-    public ApiResult<String> sendLoginCode(@Valid @RequestBody UserSendCodeRequest userSendCodeRequest)
+    @PostMapping("/send-code")
+    public ApiResult<String> sendCode(@Valid @RequestBody UserSendCodeRequest userSendCodeRequest)
             throws BusinessException {
-        verificationCodeService.sendVerificationCode(userSendCodeRequest.getEmail(), EmailPurpose.LOGIN);
-        return ApiResult.success("If the email is valid, a verification code has been sent.");
-    }
-
-    @PostMapping("/send-register-code")
-    public ApiResult<String> sendRegisterCode(@Valid @RequestBody UserSendCodeRequest userSendCodeRequest)
-            throws BusinessException {
-        verificationCodeService.sendVerificationCode(userSendCodeRequest.getEmail(), EmailPurpose.REGISTER);
-        return ApiResult.success("If the email is valid, a verification code has been sent.");
-    }
-
-    @PostMapping("/send-reset-password-code")
-    public ApiResult<String> sendResetPasswordCode(@Valid @RequestBody UserSendCodeRequest userSendCodeRequest)
-            throws BusinessException {
-        verificationCodeService.sendVerificationCode(userSendCodeRequest.getEmail(), EmailPurpose.RESET_PASSWORD);
+        verificationCodeService.sendVerificationCode(userSendCodeRequest.getEmail(), userSendCodeRequest.getPurpose());
         return ApiResult.success("If the email is valid, a verification code has been sent.");
     }
 }

@@ -20,8 +20,13 @@ public class UserEntity {
     private String address;         // VARCHAR(255)
     @JsonIgnore
     private String passwdHash;      // VARCHAR(255) NOT NULL (bcrypt 哈希)
+    private Role role;              // ENUM('STUDENT', 'TEACHER') NOT NULL
     @JsonIgnore
     private LocalDateTime createTime;
     @JsonIgnore
     private LocalDateTime updateTime;
+
+    public enum Role {
+        STUDENT, TEACHER
+    }
 }

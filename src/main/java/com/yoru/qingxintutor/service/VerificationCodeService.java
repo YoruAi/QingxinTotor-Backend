@@ -65,7 +65,7 @@ public class VerificationCodeService {
     public void sendVerificationCode(String email, EmailPurpose purpose) throws BusinessException {
         // 0. 注册用户必须未注册
         if (purpose == EmailPurpose.REGISTER && userMapper.findByEmail(email).isPresent()) {
-            throw new BusinessException("Email has registered");
+            return;
         }
         // 1. 校验邮箱是否注册
         if (purpose != EmailPurpose.REGISTER && userMapper.findByEmail(email).isEmpty()) {

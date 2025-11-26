@@ -4,6 +4,7 @@ import com.yoru.qingxintutor.pojo.entity.TeacherEntity;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class TeacherSearchRequest {
     @Max(value = 100, message = "MaxAge must be between 1 and 100")
     private Integer maxAge;
 
+    @Size(max = 50, message = "Subject name length must be less than 50")
     private String subjectName;
 
     private TeacherEntity.Gender gender;

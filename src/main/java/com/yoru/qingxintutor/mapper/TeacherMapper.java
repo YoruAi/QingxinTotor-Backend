@@ -17,12 +17,16 @@ public interface TeacherMapper {
     int update(TeacherEntity teacher);
 
     /**
-     * 根据 ID 查询用户是否存在
+     * 根据 ID 查询老师是否存在
      */
     boolean existsById(@Param("id") Long id);
 
+    Optional<Long> findTeacherIdByUserId(@Param("userId") String userId);
+
     // 以下返回TeacherInfoResult封装 //
     Optional<TeacherInfoResult> findById(@Param("id") Integer id);
+
+    Optional<TeacherInfoResult> findByUserId(@Param("userId") String userId);
 
     Optional<TeacherInfoResult> findByPhone(@Param("phone") String phone);
 

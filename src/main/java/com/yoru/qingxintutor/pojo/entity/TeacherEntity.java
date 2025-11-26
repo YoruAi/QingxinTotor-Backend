@@ -1,5 +1,6 @@
 package com.yoru.qingxintutor.pojo.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 public class TeacherEntity {
     private Long id;                    // BIGINT PRIMARY KEY AUTO_INCREMENT
+    private String userId;              // CHAR(36)    NOT NULL UNIQUE,
     private String phone;               // VARCHAR(20) NOT NULL UNIQUE
     private String nickname;            // VARCHAR(50)
     private String name;                // VARCHAR(50) NOT NULL
@@ -32,6 +34,18 @@ public class TeacherEntity {
 
     public enum Gender {
         MALE,
-        FEMALE
+        FEMALE;
+
+        @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+        public static Gender fromString(String value) {
+            if (value == null || value.isBlank()) {
+                return null;
+            }
+            try {
+                return Gender.valueOf(value.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid gender value");
+            }
+        }
     }
 }

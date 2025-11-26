@@ -1,10 +1,13 @@
 package com.yoru.qingxintutor.service;
 
 import com.yoru.qingxintutor.exception.BusinessException;
+import com.yoru.qingxintutor.mapper.TeacherMapper;
 import com.yoru.qingxintutor.mapper.UserMapper;
+import com.yoru.qingxintutor.pojo.dto.request.TeacherRegisterRequest;
 import com.yoru.qingxintutor.pojo.dto.request.UserLoginRequest;
 import com.yoru.qingxintutor.pojo.dto.request.UserRegisterRequest;
 import com.yoru.qingxintutor.pojo.dto.request.UserResetPasswordRequest;
+import com.yoru.qingxintutor.pojo.entity.TeacherEntity;
 import com.yoru.qingxintutor.pojo.entity.UserEntity;
 import com.yoru.qingxintutor.pojo.result.UserAuthResult;
 import com.yoru.qingxintutor.utils.EmailUtils;
@@ -21,10 +24,13 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-public class UserService {
+public class AuthService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private TeacherMapper teacherMapper;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -39,7 +45,7 @@ public class UserService {
     private VerificationCodeService verificationCodeService;
 
     @Transactional
-    public UserAuthResult register(UserRegisterRequest request) throws BusinessException {
+    public UserAuthResult registerStudent(UserRegisterRequest request) throws BusinessException {
         // 0. 校验
         if (userMapper.findByUsername(request.getUsername()).isPresent()) {
             throw new BusinessException("Username already taken");
@@ -56,6 +62,7 @@ public class UserService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .passwdHash(passwordEncoder.encode(request.getPassword()))
+                .role(UserEntity.Role.STUDENT)
                 .createTime(now)
                 .updateTime(now)
                 .build();
@@ -77,6 +84,64 @@ public class UserService {
                 .expireIn(jwtUtil.getJwtExpiration())
                 .userId(user.getId())
                 .username(user.getUsername())
+                .userRole(UserEntity.Role.STUDENT)
+                .build();
+    }
+
+    @Transactional
+    public UserAuthResult registerTeacher(TeacherRegisterRequest request) throws BusinessException {
+        // 0. 校验
+        if (userMapper.findByUsername(request.getUserRegisterRequest().getUsername()).isPresent()) {
+            throw new BusinessException("Username already taken");
+        }
+        if (userMapper.findByEmail(request.getUserRegisterRequest().getEmail()).isPresent()) {
+            throw new BusinessException("Email already registered");
+        }
+        verificationCodeService.attemptVerifyCode(request.getUserRegisterRequest().getEmail(),
+                request.getUserRegisterRequest().getCode());
+
+        // 1. 创建用户
+        LocalDateTime now = LocalDateTime.now();
+        UserEntity user = UserEntity.builder()
+                .id(UUID.randomUUID().toString())
+                .username(request.getUserRegisterRequest().getUsername())
+                .email(request.getUserRegisterRequest().getEmail())
+                .passwdHash(passwordEncoder.encode(request.getUserRegisterRequest().getPassword()))
+                .role(UserEntity.Role.TEACHER)
+                .createTime(now)
+                .updateTime(now)
+                .build();
+        userMapper.insert(user);
+        request.getUserRegisterRequest().setPassword(null);
+
+        // 2. 创建教师相关数据
+        TeacherEntity teacher = TeacherEntity.builder()
+                .userId(user.getId())
+                .phone(request.getTeacherInfo().getPhone())
+                .nickname(request.getTeacherInfo().getNickname())
+                .name(request.getTeacherInfo().getName())
+                .gender(request.getTeacherInfo().getGender())
+                .birthDate(request.getTeacherInfo().getBirthDate())
+                .address(request.getTeacherInfo().getAddress())
+                .teachingExperience(request.getTeacherInfo().getTeachingExperience())
+                .description(request.getTeacherInfo().getDescription())
+                .grade(request.getTeacherInfo().getGrade())
+                .build();
+        teacherMapper.insert(teacher);
+
+        // 3. 生成 JWT 令牌（通常包含用户ID）
+        String token = jwtUtil.generateToken(user.getId());
+
+        // 4. （可选）发送欢迎邮件、初始化等...
+        // 注册邮件
+        emailUtils.sendRegisterSuccess(user.getEmail(), user.getUsername());
+
+        return UserAuthResult.builder()
+                .token(token)
+                .expireIn(jwtUtil.getJwtExpiration())
+                .userId(user.getId())
+                .username(user.getUsername())
+                .userRole(UserEntity.Role.TEACHER)
                 .build();
     }
 
@@ -120,6 +185,7 @@ public class UserService {
                 .expireIn(jwtUtil.getJwtExpiration())
                 .userId(user.getId())
                 .username(user.getUsername())
+                .userRole(user.getRole())
                 .build();
     }
 

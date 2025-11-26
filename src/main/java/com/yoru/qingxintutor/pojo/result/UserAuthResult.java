@@ -1,5 +1,6 @@
 package com.yoru.qingxintutor.pojo.result;
 
+import com.yoru.qingxintutor.pojo.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +16,5 @@ public class UserAuthResult {
     private Long expireIn;  // ms
     private String userId;
     private String username;
+    private UserEntity.Role userRole;
 }

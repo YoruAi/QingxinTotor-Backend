@@ -1,5 +1,6 @@
 package com.yoru.qingxintutor.pojo.dto.response;
 
+import com.yoru.qingxintutor.pojo.entity.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,5 +23,6 @@ public class UserAuthResponse {
     public static class AuthedUser {
         private String id;
         private String username;
+        private UserEntity.Role role;
     }
 }
