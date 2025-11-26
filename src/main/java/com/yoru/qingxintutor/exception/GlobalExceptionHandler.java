@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.FileNotFoundException;
+import java.util.Objects;
 
 @Slf4j
 @RestControllerAdvice
@@ -29,17 +31,25 @@ public class GlobalExceptionHandler {
         return ApiResult.error(e.getMessage());
     }
 
-    // 请求参数校验错误
+    // Json反序列化错误
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResult<Void> handleJsonParseError(HttpMessageNotReadableException e) {
+        log.warn("Request body parse error: {}, caused by: {}", e.getMessage(),
+                Objects.requireNonNullElseGet(e.getCause(), () -> new Throwable("Unknown cause")).getMessage());
+        return ApiResult.error("Invalid request format");
+    }
+
+    // 参数解析错误
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ApiResult<Void> handleValidationErrors(MethodArgumentNotValidException e) {
+    public ApiResult<String> handleValidationErrors(MethodArgumentNotValidException e) {
         String errorMessage = e.getBindingResult().getFieldErrors().stream()
                 .findFirst()
-                .map(fieldError -> {
-                    return "Invalid request format";
-                })
+                .map(fieldError -> "Invalid value for " + fieldError.getField())
                 .orElse("Invalid input");
-        log.warn("Request with invalid argument: {}", errorMessage);
+
+        log.warn("Invalid request for GET: {}", errorMessage);
         return ApiResult.error(errorMessage);
     }
 
@@ -51,7 +61,7 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .map(ConstraintViolation::getMessage)
                 .orElse("Invalid request parameter");
-        log.warn("Constraint violation: {}", message);
+        log.warn("Invalid request for path variable: {}", message);
         return ApiResult.error(message);
     }
 
@@ -84,15 +94,15 @@ public class GlobalExceptionHandler {
 
     // 处理资源错误
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ApiResult<Void> handleNotFound(NoHandlerFoundException e) {
+    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
+    public ApiResult<Void> handleNotFound(Exception e) {
         log.warn("Request invalid url: {}", e.getMessage());
         return ApiResult.error("Request URL not exists");
     }
 
     // 处理资源错误
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({FileNotFoundException.class, NoResourceFoundException.class})
+    @ExceptionHandler({FileNotFoundException.class})
     public ApiResult<Void> handleFileNotFoundErrors(Exception e) {
         log.warn("Request invalid resource: {}", e.getMessage());
         return ApiResult.error("Resource not exists");
