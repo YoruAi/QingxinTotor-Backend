@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yoru.qingxintutor.mapper.TeacherSubjectMapper">
+    <sql id="tableName">
+        teacher_subject
+    </sql>
+
+    <sql id="allColumns">
+        teacher_id,
+        subject_id,
+        create_time
+    </sql>
+
+    <resultMap id="TeacherSubjectResultMap" type="com.yoru.qingxintutor.pojo.entity.TeacherSubjectEntity">
+        <id property="teacherId" column="teacher_id"/>
+        <id property="subjectId" column="subject_id"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <!-- 查询某教师所授科目 -->
+    <select id="findByTeacherId" resultType="com.yoru.qingxintutor.pojo.entity.SubjectEntity">
+        SELECT
+        s.id,
+        s.subject_name,
+        s.description
+        FROM teacher_subject ts
+        INNER JOIN subject s ON ts.subject_id = s.id
+        WHERE ts.teacher_id = #{teacherId}
+        ORDER BY s.id
+    </select>
+
+    <!-- 检查关联是否存在 -->
+    <select id="exists" resultType="boolean">
+        SELECT EXISTS(
+        SELECT 1 FROM teacher_subject
+        WHERE teacher_id = #{teacherId} AND subject_id = #{subjectId}
+        )
+    </select>
+
+    <!-- 插入关联 -->
+    <insert id="insert">
+        INSERT INTO
+        <include refid="tableName"/>
+        (teacher_id, subject_id)
+        VALUES (#{teacherId}, #{subjectId})
+    </insert>
+
+    <!-- 删除某教师的所有科目关联 -->
+    <delete id="deleteByTeacherId">
+        DELETE FROM
+        <include refid="tableName"/>
+        WHERE teacher_id = #{teacherId}
+    </delete>
+
+    <!-- 删除某科目的所有教师关联 -->
+    <delete id="deleteBySubjectId">
+        DELETE FROM
+        <include refid="tableName"/>
+        WHERE subject_id = #{subjectId}
+    </delete>
+
+    <!-- 删除单条关联 -->
+    <delete id="delete">
+        DELETE FROM
+        <include refid="tableName"/>
+        WHERE teacher_id = #{teacherId} AND subject_id = #{subjectId}
+    </delete>
+</mapper>

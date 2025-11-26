@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yoru.qingxintutor.mapper.SubjectMapper">
+    <sql id="tableName">
+        subject
+    </sql>
+
+    <sql id="allColumns">
+        id,
+        subject_name,
+        description
+    </sql>
+
+    <resultMap id="SubjectResultMap" type="com.yoru.qingxintutor.pojo.entity.SubjectEntity">
+        <id property="id" column="id"/>
+        <result property="subjectName" column="subject_name"/>
+        <result property="description" column="description"/>
+    </resultMap>
+
+    <select id="findById" resultMap="SubjectResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE id = #{id}
+    </select>
+
+    <select id="findBySubjectName" resultMap="SubjectResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE subject_name = #{subjectName}
+    </select>
+
+    <select id="findAll" resultMap="SubjectResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        ORDER BY id
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        <include refid="tableName"/>
+        (subject_name, description)
+        VALUES (#{subjectName}, #{description})
+    </insert>
+
+    <update id="update">
+        UPDATE
+        <include refid="tableName"/>
+        SET
+        <if test="description != null">
+            description = #{description}
+        </if>
+        <if test="subjectName != null and subjectName != ''">
+            subject_name = #{subjectName},
+        </if>
+        WHERE id = #{id}
+    </update>
+</mapper>

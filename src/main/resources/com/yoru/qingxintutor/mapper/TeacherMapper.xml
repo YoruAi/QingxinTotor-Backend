@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yoru.qingxintutor.mapper.TeacherMapper">
+    <!-- 表名 -->
+    <sql id="tableName">
+        teacher
+    </sql>
+
+    <resultMap id="TeacherResultMap" type="com.yoru.qingxintutor.pojo.entity.TeacherEntity">
+        <id property="id" column="id"/>
+        <result property="phone" column="phone"/>
+        <result property="nickname" column="nickname"/>
+        <result property="name" column="name"/>
+        <result property="gender" column="gender"/>
+        <result property="birthDate" column="birth_date"/>
+        <result property="icon" column="icon"/>
+        <result property="address" column="address"/>
+        <result property="teachingExperience" column="teaching_experience"/>
+        <result property="description" column="description"/>
+        <result property="grade" column="grade"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <!-- 插入 -->
+    <insert id="insert" parameterType="com.yoru.qingxintutor.pojo.entity.TeacherEntity"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        <include refid="tableName"/>
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="phone != null and phone != ''">
+                phone,
+            </if>
+            <if test="nickname != null and nickname != ''">
+                nickname,
+            </if>
+            <if test="name != null and name != ''">
+                name,
+            </if>
+            <if test="gender != null">
+                gender,
+            </if>
+            <if test="birthDate != null">
+                birth_date,
+            </if>
+            <if test="icon != null">
+                icon,
+            </if>
+            <if test="address != null">
+                address,
+            </if>
+            <if test="teachingExperience != null">
+                teaching_experience,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="grade != null">
+                grade,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="phone != null and phone != ''">
+                #{phone},
+            </if>
+            <if test="nickname != null and nickname != ''">
+                #{nickname},
+            </if>
+            <if test="name != null and name != ''">
+                #{name},
+            </if>
+            <if test="gender != null">
+                #{gender},
+            </if>
+            <if test="birthDate != null">
+                #{birthDate},
+            </if>
+            <if test="icon != null">
+                #{icon},
+            </if>
+            <if test="address != null">
+                #{address},
+            </if>
+            <if test="teachingExperience != null">
+                #{teachingExperience},
+            </if>
+            <if test="description != null">
+                #{description},
+            </if>
+            <if test="grade != null">
+                #{grade},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime},
+            </if>
+        </trim>
+    </insert>
+
+    <!-- 更新 -->
+    <update id="update" parameterType="com.yoru.qingxintutor.pojo.entity.TeacherEntity">
+        UPDATE
+        <include refid="tableName"/>
+        <set>
+            <if test="nickname != null">
+                nickname = #{nickname},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="birthDate != null">
+                birth_date = #{birthDate},
+            </if>
+            <if test="icon != null">
+                icon = #{icon},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="teachingExperience != null">
+                teaching_experience = #{teachingExperience},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="grade != null">
+                grade = #{grade},
+            </if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 查询是否存在 -->
+    <select id="existsById" resultType="boolean">
+        SELECT EXISTS(SELECT 1 FROM teacher WHERE id = #{id})
+    </select>
+
+    <!-- 以下为TeacherInfoResult查询 -->
+    <resultMap id="TeacherInfoResultMap" type="com.yoru.qingxintutor.pojo.result.TeacherInfoResult">
+        <id column="teacher_id" property="teacher.id"/>
+
+        <!-- 映射 avgRating -->
+        <result column="avg_rating" property="avgRating" javaType="java.math.BigDecimal"/>
+
+        <!-- 映射 teacher 字段 -->
+        <association property="teacher" javaType="com.yoru.qingxintutor.pojo.entity.TeacherEntity">
+            <id column="teacher_id" property="id"/>
+            <result column="phone" property="phone"/>
+            <result column="nickname" property="nickname"/>
+            <result column="name" property="name"/>
+            <result column="gender" property="gender"/>
+            <result column="birth_date" property="birthDate"/>
+            <result column="icon" property="icon"/>
+            <result column="address" property="address"/>
+            <result column="teaching_experience" property="teachingExperience"/>
+            <result column="description" property="description"/>
+            <result column="grade" property="grade"/>
+            <result column="create_time" property="createTime"/>
+            <result column="update_time" property="updateTime"/>
+        </association>
+
+        <!-- 映射 subjects 列表 -->
+        <collection property="subjects" ofType="com.yoru.qingxintutor.pojo.entity.SubjectEntity">
+            <id column="subject_id" property="id"/>
+            <result column="subject_name" property="subjectName"/>
+            <result column="subject_description" property="description"/>
+        </collection>
+    </resultMap>
+
+    <sql id="teacherInfoColumns">
+        t.id AS teacher_id,
+        t.phone,
+        t.nickname,
+        t.name,
+        t.gender,
+        t.birth_date,
+        t.icon,
+        t.address,
+        t.teaching_experience,
+        t.description,
+        t.grade,
+        t.create_time,
+        t.update_time,
+        COALESCE(trv.avg_rating, 0.00) AS avg_rating,
+        s.id AS subject_id,
+        s.subject_name,
+        s.description AS subject_description
+    </sql>
+
+    <!-- 公共片段：评分子查询 -->
+    <sql id="avgRatingSubQuery">
+        LEFT JOIN (
+        SELECT
+        teacher_id,
+        ROUND(COALESCE(AVG(rating), 0.00), 2) AS avg_rating
+        FROM teacher_review
+        GROUP BY teacher_id
+        ) trv ON t.id = trv.teacher_id
+    </sql>
+
+    <!-- 公共片段：科目关联 -->
+    <sql id="subjectJoin">
+        LEFT JOIN teacher_subject ts ON t.id = ts.teacher_id
+        LEFT JOIN subject s ON ts.subject_id = s.id
+    </sql>
+
+    <!-- findById -->
+    <select id="findById" resultMap="TeacherInfoResultMap">
+        SELECT
+        <include refid="teacherInfoColumns"/>
+        FROM teacher t
+        <include refid="avgRatingSubQuery"/>
+        <include refid="subjectJoin"/>
+        WHERE t.id = #{id}
+        ORDER BY s.id
+    </select>
+
+    <!-- findByPhone -->
+    <select id="findByPhone" resultMap="TeacherInfoResultMap">
+        SELECT
+        <include refid="teacherInfoColumns"/>
+        FROM teacher t
+        <include refid="avgRatingSubQuery"/>
+        <include refid="subjectJoin"/>
+        WHERE t.phone = #{phone}
+        ORDER BY s.id
+    </select>
+
+    <!-- findByGrade -->
+    <select id="findByGrade" resultMap="TeacherInfoResultMap">
+        SELECT
+        <include refid="teacherInfoColumns"/>
+        FROM teacher t
+        <include refid="avgRatingSubQuery"/>
+        <include refid="subjectJoin"/>
+        WHERE t.grade = #{grade}
+        ORDER BY trv.avg_rating DESC, t.create_time DESC, s.id
+    </select>
+
+    <!-- findBySubjectId -->
+    <select id="findBySubjectId" resultMap="TeacherInfoResultMap">
+        SELECT
+        <include refid="teacherInfoColumns"/>
+        FROM teacher t
+        <include refid="avgRatingSubQuery"/>
+        INNER JOIN teacher_subject ts ON t.id = ts.teacher_id
+        INNER JOIN subject s ON ts.subject_id = s.id
+        WHERE s.id = #{subjectId}
+        ORDER BY trv.avg_rating DESC, t.create_time DESC, s.id
+    </select>
+
+    <!-- findBySubjectName -->
+    <select id="findBySubjectName" resultMap="TeacherInfoResultMap">
+        SELECT
+        <include refid="teacherInfoColumns"/>
+        FROM teacher t
+        <include refid="avgRatingSubQuery"/>
+        INNER JOIN teacher_subject ts ON t.id = ts.teacher_id
+        INNER JOIN subject s ON ts.subject_id = s.id
+        WHERE s.subject_name LIKE CONCAT('%', #{subjectName}, '%')
+        ORDER BY trv.avg_rating DESC, t.create_time DESC, s.id
+    </select>
+
+    <select id="searchByNameOrNicknameOrPhone" resultMap="TeacherInfoResultMap">
+        SELECT
+        <include refid="teacherInfoColumns"/>
+        FROM teacher t
+        <include refid="avgRatingSubQuery"/>
+        <include refid="subjectJoin"/>
+        WHERE
+        t.name LIKE CONCAT('%', #{keyword}, '%')
+        OR t.nickname LIKE CONCAT('%', #{keyword}, '%')
+        OR t.phone LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY trv.avg_rating DESC, t.create_time DESC, s.id
+    </select>
+
+    <!-- findAll -->
+    <select id="findAll" resultMap="TeacherInfoResultMap">
+        SELECT
+        <include refid="teacherInfoColumns"/>
+        FROM teacher t
+        <include refid="avgRatingSubQuery"/>
+        <include refid="subjectJoin"/>
+        ORDER BY trv.avg_rating DESC, t.create_time DESC, s.id
+    </select>
+
+    <!-- findExcellentIds, 用于筛选分页 -->
+    <select id="findExcellentIds" resultType="long">
+        SELECT
+        t.id
+        FROM teacher t
+        INNER JOIN (
+        SELECT
+        teacher_id,
+        ROUND(AVG(rating), 2) AS avg_rating
+        FROM teacher_review
+        GROUP BY teacher_id
+        HAVING AVG(rating) >= 4.0
+        ) trv ON t.id = trv.teacher_id
+        ORDER BY trv.avg_rating DESC, t.id
+    </select>
+
+    <!-- 只查老师ID，用于完整分页 -->
+    <select id="findAllIds" resultType="long">
+        SELECT id FROM teacher ORDER BY id
+    </select>
+
+    <!-- 根据ID查完整信息 -->
+    <select id="findByIds" resultMap="TeacherInfoResultMap">
+        SELECT
+        <include refid="teacherInfoColumns"/>
+        FROM teacher t
+        <include refid="avgRatingSubQuery"/>
+        <include refid="subjectJoin"/>
+        WHERE t.id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY trv.avg_rating DESC, t.id, s.id
+    </select>
+
+    <!-- count 查询（只统计老师数量） -->
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM
+        <include refid="tableName"/>
+    </select>
+
+    <!-- 条件搜索 -->
+    <select id="findIdsByCriteria" resultType="long"
+            parameterType="com.yoru.qingxintutor.pojo.dto.request.TeacherSearchRequest">
+        SELECT t.id
+        FROM teacher t
+        <where>
+            <if test="grade != null">
+                AND t.grade = #{grade}
+            </if>
+            <if test="subjectName != null and subjectName != ''">
+                AND EXISTS (
+                SELECT 1
+                FROM teacher_subject ts
+                JOIN subject s ON ts.subject_id = s.id
+                WHERE ts.teacher_id = t.id
+                AND s.subject_name LIKE CONCAT('%', #{subjectName}, '%')
+                )
+            </if>
+            <if test="minAge != null">
+                AND TIMESTAMPDIFF(YEAR, t.birth_date, CURDATE()) &gt;= #{minAge}
+            </if>
+            <if test="maxAge != null">
+                AND TIMESTAMPDIFF(YEAR, t.birth_date, CURDATE()) &lt;= #{maxAge}
+            </if>
+            <if test="gender != null">
+                AND t.gender = #{gender}
+            </if>
+        </where>
+    </select>
+</mapper>
