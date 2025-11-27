@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -64,6 +65,8 @@ public class TeacherRegisterRequest {
         @Min(value = 1, message = "Grade must be between 1 and 9")
         @Max(value = 9, message = "Grade must be between 1 and 9")
         private Integer grade;
+
+        private List<String> subjectNames;
     }
 }
 

@@ -3,7 +3,7 @@ package com.yoru.qingxintutor.filter;
 import com.yoru.qingxintutor.exception.BusinessException;
 import com.yoru.qingxintutor.mapper.UserMapper;
 import com.yoru.qingxintutor.pojo.entity.UserEntity;
-import com.yoru.qingxintutor.utils.JwtUtil;
+import com.yoru.qingxintutor.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +22,7 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private JwtUtils jwtUtils;
 
     @Autowired
     private UserMapper userMapper;
@@ -38,7 +38,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             try {
                 String token = authHeader.substring(7);
-                String userId = jwtUtil.getUserIdFromToken(token);
+                String userId = jwtUtils.getUserIdFromToken(token);
                 // 构建认证对象 (@AuthenticationPrincipal CustomUserDetails userDetails)
                 UserEntity user = userMapper.findById(userId).orElseThrow(() -> new BusinessException("Unauthorized"));
                 CustomUserDetails userDetails = new CustomUserDetails(user);

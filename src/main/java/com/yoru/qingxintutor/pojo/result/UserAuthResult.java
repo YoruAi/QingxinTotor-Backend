@@ -14,7 +14,15 @@ public class UserAuthResult {
     private String token;
     private final String tokenType = "Bearer";
     private Long expireIn;  // ms
-    private String userId;
-    private String username;
-    private UserEntity.Role userRole;
+    private AuthedUser user;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AuthedUser {
+        private String id;
+        private String username;
+        private UserEntity.Role role;
+    }
 }

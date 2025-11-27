@@ -18,6 +18,7 @@ import java.time.Instant;
 @EqualsAndHashCode(exclude = {"password", "code"})
 public class UserLoginRequest {
 
+    @Size(max = 50, message = "Username must be shorter than 50 characters")
     private String username;
 
     @Email(message = "Invalid email format")

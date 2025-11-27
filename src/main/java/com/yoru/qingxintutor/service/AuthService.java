@@ -1,7 +1,9 @@
 package com.yoru.qingxintutor.service;
 
 import com.yoru.qingxintutor.exception.BusinessException;
+import com.yoru.qingxintutor.mapper.SubjectMapper;
 import com.yoru.qingxintutor.mapper.TeacherMapper;
+import com.yoru.qingxintutor.mapper.TeacherSubjectMapper;
 import com.yoru.qingxintutor.mapper.UserMapper;
 import com.yoru.qingxintutor.pojo.dto.request.TeacherRegisterRequest;
 import com.yoru.qingxintutor.pojo.dto.request.UserLoginRequest;
@@ -11,7 +13,7 @@ import com.yoru.qingxintutor.pojo.entity.TeacherEntity;
 import com.yoru.qingxintutor.pojo.entity.UserEntity;
 import com.yoru.qingxintutor.pojo.result.UserAuthResult;
 import com.yoru.qingxintutor.utils.EmailUtils;
-import com.yoru.qingxintutor.utils.JwtUtil;
+import com.yoru.qingxintutor.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -33,10 +37,16 @@ public class AuthService {
     private TeacherMapper teacherMapper;
 
     @Autowired
+    private TeacherSubjectMapper teacherSubjectMapper;
+
+    @Autowired
+    private SubjectMapper subjectMapper;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private JwtUtils jwtUtils;
 
     @Autowired
     private EmailUtils emailUtils;
@@ -47,13 +57,13 @@ public class AuthService {
     @Transactional
     public UserAuthResult registerStudent(UserRegisterRequest request) throws BusinessException {
         // 0. 校验
+        verificationCodeService.attemptVerifyCode(request.getEmail(), request.getCode());
         if (userMapper.findByUsername(request.getUsername()).isPresent()) {
             throw new BusinessException("Username already taken");
         }
         if (userMapper.findByEmail(request.getEmail()).isPresent()) {
             throw new BusinessException("Email already registered");
         }
-        verificationCodeService.attemptVerifyCode(request.getEmail(), request.getCode());
 
         // 1. 创建用户
         LocalDateTime now = LocalDateTime.now();
@@ -73,7 +83,7 @@ public class AuthService {
         // TODO: 用户创建附属数据
 
         // 3. 生成 JWT 令牌（通常包含用户ID）
-        String token = jwtUtil.generateToken(user.getId());
+        String token = jwtUtils.generateToken(user.getId());
 
         // 4. （可选）发送欢迎邮件、初始化学习计划等...
         // 注册邮件
@@ -81,24 +91,26 @@ public class AuthService {
 
         return UserAuthResult.builder()
                 .token(token)
-                .expireIn(jwtUtil.getJwtExpiration())
-                .userId(user.getId())
-                .username(user.getUsername())
-                .userRole(UserEntity.Role.STUDENT)
+                .expireIn(jwtUtils.getJwtExpiration())
+                .user(UserAuthResult.AuthedUser.builder()
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .role(UserEntity.Role.STUDENT)
+                        .build())
                 .build();
     }
 
     @Transactional
     public UserAuthResult registerTeacher(TeacherRegisterRequest request) throws BusinessException {
         // 0. 校验
+        verificationCodeService.attemptVerifyCode(request.getUserRegisterRequest().getEmail(),
+                request.getUserRegisterRequest().getCode());
         if (userMapper.findByUsername(request.getUserRegisterRequest().getUsername()).isPresent()) {
             throw new BusinessException("Username already taken");
         }
         if (userMapper.findByEmail(request.getUserRegisterRequest().getEmail()).isPresent()) {
             throw new BusinessException("Email already registered");
         }
-        verificationCodeService.attemptVerifyCode(request.getUserRegisterRequest().getEmail(),
-                request.getUserRegisterRequest().getCode());
 
         // 1. 创建用户
         LocalDateTime now = LocalDateTime.now();
@@ -128,9 +140,25 @@ public class AuthService {
                 .grade(request.getTeacherInfo().getGrade())
                 .build();
         teacherMapper.insert(teacher);
+        // 更新科目信息
+        // 获取请求中的新 subjectId 列表
+        List<String> subjectNames = request.getTeacherInfo().getSubjectNames();
+        List<Long> newSubjectIds = new ArrayList<>();
+        if (subjectNames != null && !subjectNames.isEmpty()) {
+            List<String> validSubjects = subjectNames.stream()
+                    .filter(s -> s != null && !s.isBlank())
+                    .map(String::trim)
+                    .distinct()
+                    .toList();
+            newSubjectIds = subjectMapper.findIdsByNames(validSubjects);
+            if (newSubjectIds.size() != validSubjects.size()) {
+                throw new BusinessException("One or more subjects do not exist");
+            }
+        }
+        teacherSubjectMapper.batchInsert(teacher.getId(), new ArrayList<>(newSubjectIds));
 
         // 3. 生成 JWT 令牌（通常包含用户ID）
-        String token = jwtUtil.generateToken(user.getId());
+        String token = jwtUtils.generateToken(user.getId());
 
         // 4. （可选）发送欢迎邮件、初始化等...
         // 注册邮件
@@ -138,10 +166,12 @@ public class AuthService {
 
         return UserAuthResult.builder()
                 .token(token)
-                .expireIn(jwtUtil.getJwtExpiration())
-                .userId(user.getId())
-                .username(user.getUsername())
-                .userRole(UserEntity.Role.TEACHER)
+                .expireIn(jwtUtils.getJwtExpiration())
+                .user(UserAuthResult.AuthedUser.builder()
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .role(user.getRole())
+                        .build())
                 .build();
     }
 
@@ -178,14 +208,16 @@ public class AuthService {
         }
 
         // 生成 Token
-        String token = jwtUtil.generateToken(user.getId());
+        String token = jwtUtils.generateToken(user.getId());
 
         return UserAuthResult.builder()
                 .token(token)
-                .expireIn(jwtUtil.getJwtExpiration())
-                .userId(user.getId())
-                .username(user.getUsername())
-                .userRole(user.getRole())
+                .expireIn(jwtUtils.getJwtExpiration())
+                .user(UserAuthResult.AuthedUser.builder()
+                        .id(user.getId())
+                        .username(user.getUsername())
+                        .role(user.getRole())
+                        .build())
                 .build();
     }
 

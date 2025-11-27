@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-public class JwtUtil {
+public class JwtUtils {
 
     @Autowired
     private JwtProperties jwtProperties;
@@ -20,7 +20,7 @@ public class JwtUtil {
     private final SecretKey secretKey;
     private final long expiration;
 
-    public JwtUtil(JwtProperties jwtProperties) {
+    public JwtUtils(JwtProperties jwtProperties) {
         this.secretKey = Keys.hmacShaKeyFor(
                 jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8)
         );

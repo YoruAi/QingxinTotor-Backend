@@ -49,10 +49,14 @@ public class GlobalExceptionHandler {
     public ApiResult<String> handleValidationErrors(MethodArgumentNotValidException e) {
         String errorMessage = e.getBindingResult().getFieldErrors().stream()
                 .findFirst()
-                .map(fieldError -> "Invalid value for " + fieldError.getField())
+                .map(fieldError -> switch (fieldError.getCode()) {
+                    case "NotBlank", "NotNull", "Min", "Max", "Email", "Size", "AssertTrue", "Phone",
+                         "StrongPassword", "ValidTimestamp" -> fieldError.getDefaultMessage();
+                    default -> "Invalid value for " + fieldError.getField();
+                })
                 .orElse("Invalid input");
 
-        log.warn("Invalid request for GET: {}", errorMessage);
+        log.warn("Invalid request: {}", errorMessage);
         return ApiResult.error(errorMessage);
     }
 
