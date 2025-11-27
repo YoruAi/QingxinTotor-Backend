@@ -1,10 +1,13 @@
 package com.yoru.qingxintutor.pojo.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
+// Used also for UserInfoResult
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,6 +30,19 @@ public class UserEntity {
     private LocalDateTime updateTime;
 
     public enum Role {
-        STUDENT, TEACHER
+        STUDENT,
+        TEACHER;
+
+        @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+        public static Role fromString(@JsonProperty String value) {
+            if (value == null || value.isBlank()) {
+                return null;
+            }
+            try {
+                return Role.valueOf(value.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid role value");
+            }
+        }
     }
 }

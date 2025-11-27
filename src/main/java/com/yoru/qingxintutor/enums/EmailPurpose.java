@@ -16,7 +16,7 @@ public enum EmailPurpose {
         try {
             return EmailPurpose.valueOf(value.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Invalid purpose value");
         }
     }
 }
