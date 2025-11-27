@@ -75,9 +75,9 @@ public class TeacherController {
     }
 
     @GetMapping("/{teacherId}/subjects")
-    public ApiResult<List<SubjectEntity>> getTeacherReviews(@PathVariable("teacherId")
-                                                            @Min(value = 1, message = "TeacherId must be a positive number")
-                                                            Long teacherId)
+    public ApiResult<List<SubjectEntity>> getTeacherSubjects(@PathVariable("teacherId")
+                                                             @Min(value = 1, message = "TeacherId must be a positive number")
+                                                             Long teacherId)
             throws BusinessException {
         return ApiResult.success(teacherService.getSubjectsById(teacherId));
     }
