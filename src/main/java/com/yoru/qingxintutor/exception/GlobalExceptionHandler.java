@@ -1,11 +1,14 @@
 package com.yoru.qingxintutor.exception;
 
 import com.yoru.qingxintutor.pojo.ApiResult;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -106,6 +109,16 @@ public class GlobalExceptionHandler {
     public ApiResult<Void> handleFileNotFoundErrors(Exception e) {
         log.warn("Request invalid resource: {}", e.getMessage());
         return ApiResult.error("Resource not exists");
+    }
+
+    // 处理角色认证错误
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ApiResult<Void> handleAccessDenied(AuthorizationDeniedException e, HttpServletRequest request) {
+        log.warn("Access denied for URI: {}, User: {}",
+                request.getRequestURI(),
+                SecurityContextHolder.getContext().getAuthentication());
+        return ApiResult.error("Access denied");
     }
 
     // 处理未知错误
