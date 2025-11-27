@@ -16,6 +16,8 @@ public interface TeacherMapper {
 
     int update(TeacherEntity teacher);
 
+    int updateIconByUserId(@Param("userId") String userId, @Param("icon") String icon);
+
     /**
      * 根据 ID 查询老师是否存在
      */
@@ -49,4 +51,6 @@ public interface TeacherMapper {
     List<Long> findAllIds();
 
     long countAll();
+
+    int updateByUserId(TeacherEntity teacher);
 }

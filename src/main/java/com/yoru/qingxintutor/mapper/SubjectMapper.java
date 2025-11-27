@@ -34,4 +34,9 @@ public interface SubjectMapper {
      * 更新科目信息
      */
     int update(SubjectEntity subject);
+
+    /**
+     * 查询科目名称对应id
+     */
+    List<Long> findIdsByNames(@Param("names") List<String> names);
 }

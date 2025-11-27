@@ -25,6 +25,11 @@ public interface TeacherSubjectMapper {
     int insert(@Param("teacherId") Long teacherId, @Param("subjectId") Long subjectId);
 
     /**
+     * 根据科目名批量插入
+     */
+    int batchInsert(@Param("teacherId") Long teacherId, @Param("subjectIds") List<Long> subjectIds);
+
+    /**
      * 删除某教师的所有科目关联
      */
     int deleteByTeacherId(@Param("teacherId") Long teacherId);
@@ -38,4 +43,9 @@ public interface TeacherSubjectMapper {
      * 删除指定的教师-科目关联
      */
     int delete(@Param("teacherId") Long teacherId, @Param("subjectId") Long subjectId);
+
+    /**
+     * 删除教师多个指定的科目关联
+     */
+    void deleteByTeacherIdAndSubjectIds(@Param("teacherId") Long teacherId, @Param("subjectIds") List<Long> subjectIds);
 }

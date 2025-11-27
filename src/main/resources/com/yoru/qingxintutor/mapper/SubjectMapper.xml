@@ -63,4 +63,15 @@
         </if>
         WHERE id = #{id}
     </update>
+
+    <select id="findIdsByNames" resultType="long">
+        SELECT
+        id
+        FROM
+        <include refid="tableName"/>
+        WHERE subject_name IN
+        <foreach collection="names" item="name" open="(" separator="," close=")">
+            #{name}
+        </foreach>
+    </select>
 </mapper>

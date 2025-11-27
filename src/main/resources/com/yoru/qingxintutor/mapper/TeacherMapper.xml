@@ -152,6 +152,43 @@
         WHERE id = #{id}
     </update>
 
+    <!-- 根据user_id更新 -->
+    <update id="updateByUserId" parameterType="com.yoru.qingxintutor.pojo.entity.TeacherEntity">
+        UPDATE
+        <include refid="tableName"/>
+        <set>
+            <if test="nickname != null">
+                nickname = #{nickname},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="birthDate != null">
+                birth_date = #{birthDate},
+            </if>
+            <if test="icon != null">
+                icon = #{icon},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="teachingExperience != null">
+                teaching_experience = #{teachingExperience},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="grade != null">
+                grade = #{grade},
+            </if>
+            update_time = CURRENT_TIMESTAMP
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+
     <!-- 查询是否存在 -->
     <select id="existsById" resultType="boolean">
         SELECT EXISTS(SELECT 1 FROM teacher WHERE id = #{id})
@@ -167,6 +204,7 @@
         <!-- 映射 teacher 字段 -->
         <association property="teacher" javaType="com.yoru.qingxintutor.pojo.entity.TeacherEntity">
             <id column="teacher_id" property="id"/>
+            <result column="user_id" property="userId"/>
             <result column="phone" property="phone"/>
             <result column="nickname" property="nickname"/>
             <result column="name" property="name"/>
@@ -191,6 +229,7 @@
 
     <sql id="teacherInfoColumns">
         t.id AS teacher_id,
+        t.user_id,
         t.phone,
         t.nickname,
         t.name,
@@ -388,10 +427,14 @@
 
     <select id="findTeacherIdByUserId" resultType="java.lang.Long">
         SELECT
-        t.id
-        FROM teacher t
-        <include refid="avgRatingSubQuery"/>
-        <include refid="subjectJoin"/>
-        WHERE t.user_id = #{userId}
+        id
+        FROM teacher
+        WHERE user_id = #{userId}
     </select>
+
+    <update id="updateIconByUserId">
+        UPDATE teacher
+        SET icon = #{icon}
+        WHERE user_id = #{userId}
+    </update>
 </mapper>

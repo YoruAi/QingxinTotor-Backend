@@ -68,4 +68,24 @@
         <include refid="tableName"/>
         WHERE teacher_id = #{teacherId} AND subject_id = #{subjectId}
     </delete>
+
+    <insert id="batchInsert">
+        INSERT INTO
+        <include refid="tableName"/>
+        (teacher_id, subject_id)
+        VALUES
+        <foreach collection="subjectIds" item="subjectId" separator=",">
+            (#{teacherId}, #{subjectId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByTeacherIdAndSubjectIds">
+        DELETE FROM
+        <include refid="tableName"/>
+        WHERE teacher_id = #{teacherId}
+        AND subject_id IN
+        <foreach collection="subjectIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>
