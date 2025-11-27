@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @PreAuthorize(Roles.IS_STUDENT)
-public @interface RequireUser {
+public @interface RequireStudent {
 }

@@ -66,6 +66,7 @@ public class UserController {
     */
 
     /*
+    @RequireStudent
     GET     /api/user/reviews
     GET     /api/user/review/:id
     */
