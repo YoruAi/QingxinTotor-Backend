@@ -22,7 +22,7 @@ public class TeacherUpdateRequest {
     @Phone
     private String phone;
 
-    @Size(max = 50, message = "Nickname must not exceed 50 characters")
+    @Size(min = 1, max = 50, message = "Nickname must be between 1 and 50 characters")
     private String nickname;
 
     @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
@@ -33,13 +33,13 @@ public class TeacherUpdateRequest {
     @Past(message = "Birth date must be in the past")
     private LocalDate birthDate;
 
-    @Size(max = 255, message = "Address must not exceed 255 characters")
+    @Size(min = 1, max = 255, message = "Address must be between 1 and 255 characters")
     private String address;
 
-    @Size(max = 1000, message = "Teaching experience must not exceed 1000 characters")
+    @Size(min = 1, max = 1000, message = "Teaching experience must be between 1 and 1000 characters")
     private String teachingExperience;
 
-    @Size(max = 1000, message = "Description must not exceed 1000 characters")
+    @Size(min = 1, max = 1000, message = "Description must be between 1 and 1000 characters")
     private String description;
 
     @Min(value = 1, message = "Grade must be between 1 and 9")

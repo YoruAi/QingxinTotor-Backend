@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
         String errorMessage = e.getBindingResult().getFieldErrors().stream()
                 .findFirst()
                 .map(fieldError -> switch (fieldError.getCode()) {
-                    case "NotBlank", "NotNull", "Min", "Max", "Email", "Size", "AssertTrue", "Phone",
+                    case "NotBlank", "NotNull", "Min", "Max", "Email", "Size", "AssertTrue", "Past", "Future", "Phone",
                          "StrongPassword", "ValidTimestamp" -> fieldError.getDefaultMessage();
                     default -> "Invalid value for " + fieldError.getField();
                 })

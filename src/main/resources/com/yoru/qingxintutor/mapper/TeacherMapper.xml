@@ -322,17 +322,16 @@
         ORDER BY trv.avg_rating DESC, t.create_time DESC, s.id
     </select>
 
-    <select id="searchByNameOrNicknameOrPhone" resultMap="TeacherInfoResultMap">
+    <select id="searchByNameOrNicknameOrPhone" resultType="long">
         SELECT
-        <include refid="teacherInfoColumns"/>
+        t.id
         FROM teacher t
         <include refid="avgRatingSubQuery"/>
-        <include refid="subjectJoin"/>
         WHERE
         t.name LIKE CONCAT('%', #{keyword}, '%')
         OR t.nickname LIKE CONCAT('%', #{keyword}, '%')
         OR t.phone LIKE CONCAT('%', #{keyword}, '%')
-        ORDER BY trv.avg_rating DESC, t.create_time DESC, s.id
+        ORDER BY trv.avg_rating DESC, t.create_time DESC
     </select>
 
     <!-- findAll -->
@@ -389,19 +388,24 @@
     <!-- 条件搜索 -->
     <select id="findIdsByCriteria" resultType="long"
             parameterType="com.yoru.qingxintutor.pojo.dto.request.TeacherSearchRequest">
-        SELECT t.id
+        SELECT
+        t.id
         FROM teacher t
         <where>
             <if test="grade != null">
                 AND t.grade = #{grade}
             </if>
-            <if test="subjectName != null and subjectName != ''">
+            <if test="subjectNames != null and !subjectNames.isEmpty()">
                 AND EXISTS (
                 SELECT 1
                 FROM teacher_subject ts
                 JOIN subject s ON ts.subject_id = s.id
                 WHERE ts.teacher_id = t.id
-                AND s.subject_name LIKE CONCAT('%', #{subjectName}, '%')
+                AND (
+                <foreach collection="subjectNames" item="name" separator=" OR ">
+                    s.subject_name LIKE CONCAT('%', #{name}, '%')
+                </foreach>
+                )
                 )
             </if>
             <if test="minAge != null">

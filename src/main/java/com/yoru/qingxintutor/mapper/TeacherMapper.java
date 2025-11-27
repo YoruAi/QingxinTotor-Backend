@@ -16,6 +16,8 @@ public interface TeacherMapper {
 
     int update(TeacherEntity teacher);
 
+    int updateByUserId(TeacherEntity teacher);
+
     int updateIconByUserId(@Param("userId") String userId, @Param("icon") String icon);
 
     /**
@@ -38,7 +40,7 @@ public interface TeacherMapper {
 
     List<TeacherInfoResult> findBySubjectName(@Param("subjectName") String subjectName);
 
-    List<TeacherInfoResult> searchByNameOrNicknameOrPhone(@Param("keyword") String keyword);
+    List<Long> searchByNameOrNicknameOrPhone(@Param("keyword") String keyword);
 
     List<TeacherInfoResult> findAll();
 
@@ -51,6 +53,4 @@ public interface TeacherMapper {
     List<Long> findAllIds();
 
     long countAll();
-
-    int updateByUserId(TeacherEntity teacher);
 }

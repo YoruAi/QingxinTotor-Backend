@@ -54,6 +54,12 @@ public class TeacherService {
         // 根据 user_id 查询教师id
         Long teacherId = teacherMapper.findTeacherIdByUserId(userId)
                 .orElseThrow(() -> new BusinessException("Teacher not found"));
+        if (request.getPhone() != null) {
+            Optional<TeacherInfoResult> teacher = teacherMapper.findByPhone(request.getPhone());
+            if (teacher.isPresent() && !userId.equals(teacher.get().getTeacher().getUserId())) {
+                throw new BusinessException("Phone is repeated with other teachers' phone");
+            }
+        }
         TeacherEntity updateTeacher = TeacherEntity.builder()
                 .id(teacherId)
                 .userId(userId)
@@ -151,8 +157,15 @@ public class TeacherService {
     /**
      * 根据搜索条件查询教师信息
      */
-    public PageInfo<TeacherInfoResult> search(TeacherSearchRequest request, Integer pageNum, Integer pageSize) {
+    public PageInfo<TeacherInfoResult> filter(TeacherSearchRequest request, Integer pageNum, Integer pageSize) {
         return queryPageByIds(() -> teacherMapper.findIdsByCriteria(request), pageNum, pageSize);
+    }
+
+    /**
+     * 搜索查询教师信息
+     */
+    public PageInfo<TeacherInfoResult> search(String text, Integer pageNum, Integer pageSize) {
+        return queryPageByIds(() -> teacherMapper.searchByNameOrNicknameOrPhone(text), pageNum, pageSize);
     }
 
 
