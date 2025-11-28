@@ -23,10 +23,6 @@ public class UserService {
                 throw new BusinessException("Username has been registered");
             }
         }
-        if (request.getNickname().isBlank())
-            throw new BusinessException("Nickname cannot be composed of only whitespace characters");
-        if (request.getAddress().isBlank())
-            throw new BusinessException("Address cannot be composed of only whitespace characters");
         UserEntity updateUser = UserEntity.builder()
                 .id(id)
                 .username(request.getUsername())

@@ -7,28 +7,24 @@ import jakarta.validation.Payload;
 
 import java.lang.annotation.*;
 
+@Constraint(validatedBy = OptionalNotBlankValidator.class)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = PhoneValidator.class)
 @Documented
-public @interface Phone {
-    String message() default "Invalid phone number format";
+public @interface OptionalNotBlank {
+    String message() default "must not be blank if present";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
 }
 
-class PhoneValidator implements ConstraintValidator<Phone, String> {
-
-    // 中国大陆手机号正则（覆盖 13~19 开头）
-    private static final String PHONE_PATTERN = "^1[3-9]\\d{9}$";
-
+class OptionalNotBlankValidator implements ConstraintValidator<OptionalNotBlank, String> {
     @Override
-    public boolean isValid(String phone, ConstraintValidatorContext context) {
-        if (phone == null) {
+    public boolean isValid(String value, ConstraintValidatorContext context) {
+        if (value == null) {
             return true;
         }
-        return phone.matches(PHONE_PATTERN);
+        return !value.isBlank();
     }
 }

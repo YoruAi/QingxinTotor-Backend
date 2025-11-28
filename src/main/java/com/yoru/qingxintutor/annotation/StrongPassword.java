@@ -25,7 +25,8 @@ public @interface StrongPassword {
 class StrongPasswordValidator implements ConstraintValidator<StrongPassword, String> {
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {
-        if (password == null || password.length() < 8) return false;
+        if (password == null) return true;
+        if (password.length() < 8) return false;
 
         boolean hasLower = false, hasUpper = false, hasDigit = false, hasSpecial = false;
         for (char c : password.toCharArray()) {
