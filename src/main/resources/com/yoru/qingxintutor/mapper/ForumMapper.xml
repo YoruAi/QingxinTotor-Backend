@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yoru.qingxintutor.mapper.ForumMapper">
+    <sql id="tableName">
+        forum
+    </sql>
+
+    <sql id="allColumns">
+        id,
+        name,
+        description,
+        create_time
+    </sql>
+
+    <resultMap id="ForumResultMap" type="com.yoru.qingxintutor.pojo.entity.ForumEntity">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="findById" resultMap="ForumResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByName" resultMap="ForumResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE name = #{name}
+    </select>
+
+    <select id="findAll" resultMap="ForumResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        ORDER BY id
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        <include refid="tableName"/>
+        (name, description)
+        VALUES (#{name}, #{description})
+    </insert>
+</mapper>

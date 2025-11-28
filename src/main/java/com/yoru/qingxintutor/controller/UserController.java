@@ -4,10 +4,7 @@ import com.yoru.qingxintutor.annotation.auth.RequireStudent;
 import com.yoru.qingxintutor.filter.CustomUserDetails;
 import com.yoru.qingxintutor.pojo.ApiResult;
 import com.yoru.qingxintutor.pojo.dto.request.UserUpdateRequest;
-import com.yoru.qingxintutor.pojo.entity.TeacherReviewEntity;
-import com.yoru.qingxintutor.pojo.result.NotificationInfoResult;
-import com.yoru.qingxintutor.pojo.result.StudyPlanInfoResult;
-import com.yoru.qingxintutor.pojo.result.UserInfoResult;
+import com.yoru.qingxintutor.pojo.result.*;
 import com.yoru.qingxintutor.service.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -59,12 +56,26 @@ public class UserController {
     GET    /api/user/feedbacks
     GET    /api/user/feedback/:id
      */
-    
+
     /*
     GET    /api/user/forum-messages
     GET    /api/user/forum-message/:id
     */
-    
+    @Autowired
+    private ForumMessageService forumMessageService;
+
+    @GetMapping("/forum-messages")
+    public ApiResult<List<ForumMessageInfoResult>> getMessages(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResult.success(forumMessageService.listAllByUserId(userDetails.getUser().getId()));
+    }
+
+    @GetMapping("/forum-message/{id}")
+    public ApiResult<ForumMessageInfoResult> getMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                        @PathVariable
+                                                        @Min(value = 1, message = "Id must be a positive number")
+                                                        Long id) {
+        return ApiResult.success(forumMessageService.findById(userDetails.getUser().getId(), id));
+    }
 
     /*
     @RequireStudent
@@ -76,16 +87,16 @@ public class UserController {
 
     @RequireStudent
     @GetMapping("/reviews")
-    public ApiResult<List<TeacherReviewEntity>> getReviews(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResult<List<ReviewInfoResult>> getReviews(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResult.success(reviewService.listAllByUserId(userDetails.getUser().getId()));
     }
 
     @RequireStudent
     @GetMapping("/review/{id}")
-    public ApiResult<TeacherReviewEntity> getReviewById(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                        @PathVariable("id")
-                                                        @Min(value = 1, message = "Id must be a positive number")
-                                                        Long id) {
+    public ApiResult<ReviewInfoResult> getReviewById(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                     @PathVariable("id")
+                                                     @Min(value = 1, message = "Id must be a positive number")
+                                                     Long id) {
         return ApiResult.success(reviewService.findById(userDetails.getUser().getId(), id));
     }
 

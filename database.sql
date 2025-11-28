@@ -192,7 +192,7 @@ CREATE TABLE forum_message
 (
     id          BIGINT PRIMARY KEY AUTO_INCREMENT,
     forum_id    BIGINT   NOT NULL,
-    user_id     CHAR(36),
+    user_id     CHAR(36) NOT NULL,
     content     TEXT     NOT NULL,
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_forum_id (forum_id),
