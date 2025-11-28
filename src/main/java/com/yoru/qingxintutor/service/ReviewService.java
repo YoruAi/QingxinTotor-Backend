@@ -28,11 +28,9 @@ public class ReviewService {
                 .toList();
     }
 
-    public ReviewInfoResult findById(String userId, Long id) {
+    public ReviewInfoResult findById(Long id) {
         TeacherReviewEntity review = reviewMapper.findById(id)
                 .orElseThrow(() -> new BusinessException("Review not found"));
-        if (!userId.equals(review.getUserId()))
-            throw new BusinessException("Review not found");
         return entityToResult(review, teacherService.getNameById(review.getTeacherId()));
     }
 

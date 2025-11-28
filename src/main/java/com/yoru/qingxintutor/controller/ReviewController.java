@@ -23,11 +23,19 @@ public class ReviewController {
     private ReviewService reviewService;
 
     /*
+    GET     /:id   -- get
     @RequireStudent
-    POST    /      -- create(return)
+    POST    /      -- create
     PUT     /:id   -- update
     DELETE  /:id   -- delete/completed
      */
+    @GetMapping("/{id}")
+    public ApiResult<ReviewInfoResult> getReviewById(@PathVariable("id")
+                                                     @Min(value = 1, message = "Id must be a positive number")
+                                                     Long id) {
+        return ApiResult.success(reviewService.findById(id));
+    }
+
     @RequireStudent
     @PostMapping
     public ApiResult<ReviewInfoResult> createReview(@AuthenticationPrincipal CustomUserDetails userDetails,

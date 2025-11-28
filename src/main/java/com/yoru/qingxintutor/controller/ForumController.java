@@ -27,6 +27,20 @@ public class ForumController {
     @Autowired
     private ForumService forumService;
 
+    /*
+    GET     /message/{id}           -- 根据 ID 获取某条论坛消息（公开）
+    POST    /{forumId}/message      -- 在指定论坛发布新消息
+    GET     /{forumId}/messages     -- 获取指定论坛的所有消息
+    GET     /all                    -- 获取所有论坛列表
+    GET     /{forumId}              -- 根据 ID 获取论坛详情
+     */
+    @GetMapping("/message/{id}")
+    public ApiResult<ForumMessageInfoResult> getMessage(@PathVariable
+                                                        @Min(value = 1, message = "Id must be a positive number")
+                                                        Long id) {
+        return ApiResult.success(forumMessageService.findById(id));
+    }
+
     @PostMapping("/{forumId}/message")
     public ApiResult<ForumMessageInfoResult> sendMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                          @PathVariable

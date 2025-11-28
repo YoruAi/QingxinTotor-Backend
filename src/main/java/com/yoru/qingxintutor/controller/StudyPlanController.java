@@ -23,6 +23,7 @@ public class StudyPlanController {
     private StudyPlanService studyPlanService;
 
     /*
+    @RequireStudent
     POST    /      -- create(return)
     PUT     /:id   -- update
     DELETE  /:id   -- delete/completed

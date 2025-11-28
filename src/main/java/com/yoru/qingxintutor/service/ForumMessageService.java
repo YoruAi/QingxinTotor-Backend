@@ -51,15 +51,13 @@ public class ForumMessageService {
                 .toList();
     }
 
-    public ForumMessageInfoResult findById(String userId, Long id) {
+    public ForumMessageInfoResult findById(Long id) {
         ForumMessageEntity forumMessage = forumMessageMapper.findById(id)
                 .orElseThrow(() -> new BusinessException("Forum message not found"));
-        if (!userId.equals(forumMessage.getUserId()))
-            throw new BusinessException("Forum message not found");
         String forumName = forumMapper.findById(forumMessage.getForumId())
                 .orElseThrow(() -> new BusinessException("Forum not found"))
                 .getName();
-        String username = userMapper.findById(userId)
+        String username = userMapper.findById(forumMessage.getUserId())
                 .orElseThrow(() -> new BusinessException("User not found"))
                 .getUsername();
         return entityToResult(forumMessage, forumName, username);

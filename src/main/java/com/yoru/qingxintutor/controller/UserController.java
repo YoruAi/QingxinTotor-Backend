@@ -59,7 +59,6 @@ public class UserController {
 
     /*
     GET    /api/user/forum-messages
-    GET    /api/user/forum-message/:id
     */
     @Autowired
     private ForumMessageService forumMessageService;
@@ -69,18 +68,9 @@ public class UserController {
         return ApiResult.success(forumMessageService.listAllByUserId(userDetails.getUser().getId()));
     }
 
-    @GetMapping("/forum-message/{id}")
-    public ApiResult<ForumMessageInfoResult> getMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                        @PathVariable
-                                                        @Min(value = 1, message = "Id must be a positive number")
-                                                        Long id) {
-        return ApiResult.success(forumMessageService.findById(userDetails.getUser().getId(), id));
-    }
-
     /*
     @RequireStudent
     GET     /api/user/reviews
-    GET     /api/user/review/:id
     */
     @Autowired
     private ReviewService reviewService;
@@ -89,15 +79,6 @@ public class UserController {
     @GetMapping("/reviews")
     public ApiResult<List<ReviewInfoResult>> getReviews(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResult.success(reviewService.listAllByUserId(userDetails.getUser().getId()));
-    }
-
-    @RequireStudent
-    @GetMapping("/review/{id}")
-    public ApiResult<ReviewInfoResult> getReviewById(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                     @PathVariable("id")
-                                                     @Min(value = 1, message = "Id must be a positive number")
-                                                     Long id) {
-        return ApiResult.success(reviewService.findById(userDetails.getUser().getId(), id));
     }
 
     /*
