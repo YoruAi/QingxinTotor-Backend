@@ -75,4 +75,27 @@
         <include refid="tableName"/>
         WHERE user_id = #{userId}
     </select>
+
+    <delete id="deleteById">
+        DELETE FROM
+        <include refid="tableName"/>
+        WHERE id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.yoru.qingxintutor.pojo.entity.TeacherReviewEntity">
+        UPDATE
+        <include refid="tableName"/>
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="rating != null">
+                rating = #{rating},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
 </mapper>

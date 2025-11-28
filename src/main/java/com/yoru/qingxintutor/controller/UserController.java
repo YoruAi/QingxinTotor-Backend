@@ -4,23 +4,23 @@ import com.yoru.qingxintutor.annotation.auth.RequireStudent;
 import com.yoru.qingxintutor.filter.CustomUserDetails;
 import com.yoru.qingxintutor.pojo.ApiResult;
 import com.yoru.qingxintutor.pojo.dto.request.UserUpdateRequest;
+import com.yoru.qingxintutor.pojo.entity.TeacherReviewEntity;
 import com.yoru.qingxintutor.pojo.result.NotificationInfoResult;
 import com.yoru.qingxintutor.pojo.result.StudyPlanInfoResult;
 import com.yoru.qingxintutor.pojo.result.UserInfoResult;
-import com.yoru.qingxintutor.service.AvatarService;
-import com.yoru.qingxintutor.service.NotificationService;
-import com.yoru.qingxintutor.service.StudyPlanService;
-import com.yoru.qingxintutor.service.UserService;
+import com.yoru.qingxintutor.service.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -64,39 +64,29 @@ public class UserController {
     GET    /api/user/forum-messages
     GET    /api/user/forum-message/:id
     */
+    
 
     /*
     @RequireStudent
     GET     /api/user/reviews
     GET     /api/user/review/:id
     */
-
-
-    /*
-    @RequireStudent
-    GET    /api/user/study_plans?subjectName=数学
-    GET    /api/user/study_plan/:id
-     */
     @Autowired
-    private StudyPlanService studyPlanService;
+    private ReviewService reviewService;
 
     @RequireStudent
-    @GetMapping("/study-plans")
-    public ApiResult<List<StudyPlanInfoResult>> getStudyPlans(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                              @RequestParam(required = false) String subjectName) {
-        if (StringUtils.hasText(subjectName))
-            return ApiResult.success(studyPlanService.listAllBySubjectName(userDetails.getUser().getId(), subjectName));
-        else
-            return ApiResult.success(studyPlanService.listAll(userDetails.getUser().getId()));
+    @GetMapping("/reviews")
+    public ApiResult<List<TeacherReviewEntity>> getReviews(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResult.success(reviewService.listAllByUserId(userDetails.getUser().getId()));
     }
 
     @RequireStudent
-    @GetMapping("/study-plan/{id}")
-    public ApiResult<StudyPlanInfoResult> getStudyPlanById(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                           @PathVariable("id")
-                                                           @Min(value = 1, message = "Id must be a positive number")
-                                                           Long id) {
-        return ApiResult.success(studyPlanService.findById(userDetails.getUser().getId(), id));
+    @GetMapping("/review/{id}")
+    public ApiResult<TeacherReviewEntity> getReviewById(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                        @PathVariable("id")
+                                                        @Min(value = 1, message = "Id must be a positive number")
+                                                        Long id) {
+        return ApiResult.success(reviewService.findById(userDetails.getUser().getId(), id));
     }
 
     /*
@@ -123,6 +113,33 @@ public class UserController {
                                             @Min(value = 1, message = "Id must be a positive number")
                                             Long id) {
         return ApiResult.success(notificationService.findById(userDetails.getUser().getId(), id));
+    }
+
+    /*
+    @RequireStudent
+    GET    /api/user/study_plans?subjectName=数学
+    GET    /api/user/study_plan/:id
+     */
+    @Autowired
+    private StudyPlanService studyPlanService;
+
+    @RequireStudent
+    @GetMapping("/study-plans")
+    public ApiResult<List<StudyPlanInfoResult>> getStudyPlans(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                              @RequestParam(required = false) String subjectName) {
+        if (StringUtils.hasText(subjectName))
+            return ApiResult.success(studyPlanService.listAllBySubjectName(userDetails.getUser().getId(), subjectName));
+        else
+            return ApiResult.success(studyPlanService.listAll(userDetails.getUser().getId()));
+    }
+
+    @RequireStudent
+    @GetMapping("/study-plan/{id}")
+    public ApiResult<StudyPlanInfoResult> getStudyPlanById(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                           @PathVariable("id")
+                                                           @Min(value = 1, message = "Id must be a positive number")
+                                                           Long id) {
+        return ApiResult.success(studyPlanService.findById(userDetails.getUser().getId(), id));
     }
 
 
