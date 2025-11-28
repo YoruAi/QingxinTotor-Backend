@@ -1,6 +1,5 @@
 package com.yoru.qingxintutor.controller;
 
-import com.yoru.qingxintutor.exception.BusinessException;
 import com.yoru.qingxintutor.pojo.ApiResult;
 import com.yoru.qingxintutor.pojo.entity.SubjectEntity;
 import com.yoru.qingxintutor.service.SubjectService;
@@ -25,8 +24,7 @@ public class SubjectController {
     }
 
     @GetMapping("/search")
-    public ApiResult<SubjectEntity> listAllSubjects(@RequestParam String subjectName)
-            throws BusinessException {
+    public ApiResult<SubjectEntity> listAllSubjects(@RequestParam String subjectName) {
         return ApiResult.success(subjectService.getByName(subjectName));
     }
 }

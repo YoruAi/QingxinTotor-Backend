@@ -2,7 +2,6 @@ package com.yoru.qingxintutor.controller;
 
 import com.github.pagehelper.PageInfo;
 import com.yoru.qingxintutor.annotation.auth.RequireTeacher;
-import com.yoru.qingxintutor.exception.BusinessException;
 import com.yoru.qingxintutor.filter.CustomUserDetails;
 import com.yoru.qingxintutor.pojo.ApiResult;
 import com.yoru.qingxintutor.pojo.dto.request.TeacherSearchRequest;
@@ -69,31 +68,27 @@ public class TeacherController {
                                                                       @Min(value = 1, message = "TeacherId must be a positive number")
                                                                       Long teacherId,
                                                                       @RequestParam(defaultValue = "1") Integer pageNum,
-                                                                      @RequestParam(defaultValue = "6") Integer pageSize)
-            throws BusinessException {
+                                                                      @RequestParam(defaultValue = "6") Integer pageSize) {
         return ApiResult.success(teacherService.getReviewsById(teacherId, pageNum, pageSize));
     }
 
     @GetMapping("/{teacherId}/subjects")
     public ApiResult<List<SubjectEntity>> getTeacherSubjects(@PathVariable("teacherId")
                                                              @Min(value = 1, message = "TeacherId must be a positive number")
-                                                             Long teacherId)
-            throws BusinessException {
+                                                             Long teacherId) {
         return ApiResult.success(teacherService.getSubjectsById(teacherId));
     }
 
     @RequireTeacher
     @GetMapping("/me")
-    public ApiResult<TeacherInfoResult> getProfiles(@AuthenticationPrincipal CustomUserDetails userDetails)
-            throws BusinessException {
+    public ApiResult<TeacherInfoResult> getProfiles(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResult.success(teacherService.getInfoByUserId(userDetails.getUser().getId()));
     }
 
     @RequireTeacher
     @PutMapping("/me")
     public ApiResult<TeacherInfoResult> updateProfiles(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                       @Valid @RequestBody TeacherUpdateRequest teacherUpdateRequest)
-            throws BusinessException {
+                                                       @Valid @RequestBody TeacherUpdateRequest teacherUpdateRequest) {
         teacherService.updateInfoByUserId(userDetails.getUser().getId(), teacherUpdateRequest);
         return ApiResult.success(teacherService.getInfoByUserId(userDetails.getUser().getId()));
     }
@@ -101,8 +96,7 @@ public class TeacherController {
     @RequireTeacher
     @PostMapping("/upload-avatar")
     public ApiResult<TeacherInfoResult> uploadAvatar(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                     @RequestParam("file") MultipartFile file)
-            throws BusinessException {
+                                                     @RequestParam("file") MultipartFile file) {
 
         String accessURL = avatarService.uploadAvatar(file);
         teacherService.updateAvatarByUserId(userDetails.getUser().getId(), accessURL);
