@@ -20,11 +20,11 @@ public class StudyPlanUpdateRequest {
     private String subjectName;
 
     @OptionalNotBlank(message = "Title cannot be composed of only whitespace characters")
-    @Size(min = 1, max = 100, message = "SubjectName must be between 1 and 100 characters")
+    @Size(min = 1, max = 100, message = "Title must be between 1 and 100 characters")
     private String title;
 
     @OptionalNotBlank(message = "Content cannot be composed of only whitespace characters")
-    @Size(min = 1, max = 255, message = "SubjectName must be between 1 and 255 characters")
+    @Size(min = 1, max = 255, message = "Content must be between 1 and 255 characters")
     private String content;
 
     @Future(message = "TargetCompletionTime must be in the future")

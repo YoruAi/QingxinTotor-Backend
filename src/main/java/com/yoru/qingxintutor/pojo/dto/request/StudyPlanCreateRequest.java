@@ -20,12 +20,12 @@ public class StudyPlanCreateRequest {
     @Size(max = 50, message = "SubjectName must be between 1 and 50 characters")
     private String subjectName;
 
-    @NotBlank(message = "SubjectName is required")
-    @Size(max = 100, message = "SubjectName must be between 1 and 100 characters")
+    @NotBlank(message = "Title is required")
+    @Size(max = 100, message = "Title must be between 1 and 100 characters")
     private String title;
 
-    @NotBlank(message = "SubjectName is required")
-    @Size(max = 255, message = "SubjectName must be between 1 and 255 characters")
+    @NotBlank(message = "Content is required")
+    @Size(max = 255, message = "Content must be between 1 and 255 characters")
     private String content;
 
     @NotNull(message = "TargetCompletionTime is required")
