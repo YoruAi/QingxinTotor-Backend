@@ -30,7 +30,7 @@ public class VoucherController {
     发放逻辑应在 ReservationService.complete 中调用 voucherService.issue。
      */
     @RequireStudent
-    @GetMapping
+    @GetMapping("/all")
     public ApiResult<List<UserVoucherEntity>> getAllVouchers(
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         List<UserVoucherEntity> vouchers = voucherService.listAllByUserId(userDetails.getUser().getId());
