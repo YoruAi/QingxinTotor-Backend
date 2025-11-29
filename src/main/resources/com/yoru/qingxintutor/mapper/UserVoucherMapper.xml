@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yoru.qingxintutor.mapper.UserVoucherMapper">
+    <sql id="tableName">
+        user_voucher
+    </sql>
+
+    <sql id="allColumns">
+        id,
+        user_id,
+        amount,
+        create_time,
+        expire_time
+    </sql>
+
+    <resultMap id="UserVoucherResultMap" type="com.yoru.qingxintutor.pojo.entity.UserVoucherEntity">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="amount" column="amount"/>
+        <result property="createTime" column="create_time"/>
+        <result property="expireTime" column="expire_time"/>
+    </resultMap>
+
+    <select id="findById" resultMap="UserVoucherResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByUserId" resultMap="UserVoucherResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE user_id = #{userId}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查询未过期的奖学券 -->
+    <select id="findValidByUserId" resultMap="UserVoucherResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE user_id = #{userId}
+        AND expire_time > NOW()
+        ORDER BY expire_time ASC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        <include refid="tableName"/>
+        (user_id, amount, expire_time)
+        VALUES (#{userId}, #{amount}, #{expireTime})
+    </insert>
+
+    <!-- 删除已过期券 -->
+    <delete id="deleteExpired">
+        DELETE FROM
+        <include refid="tableName"/>
+        WHERE expire_time &lt;= NOW()
+    </delete>
+
+    <!-- 根据id删除一张券 -->
+    <delete id="deleteById">
+        DELETE FROM
+        <include refid="tableName"/>
+        WHERE id = #{id}
+    </delete>
+</mapper>
