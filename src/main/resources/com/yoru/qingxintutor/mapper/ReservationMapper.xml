@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yoru.qingxintutor.mapper.ReservationMapper">
+    <sql id="tableName">
+        reservation
+    </sql>
+
+    <sql id="allColumns">
+        id,
+        user_id,
+        teacher_id,
+        subject_id,
+        start_time,
+        duration,
+        state,
+        create_time
+    </sql>
+
+    <resultMap id="ReservationResultMap" type="com.yoru.qingxintutor.pojo.entity.ReservationEntity">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="teacherId" column="teacher_id"/>
+        <result property="subjectId" column="subject_id"/>
+        <result property="startTime" column="start_time"/>
+        <result property="duration" column="duration"/>
+        <result property="state" column="state"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <select id="findByIdAndUserId" resultMap="ReservationResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE id = #{id} AND user_id = #{userId}
+    </select>
+
+    <select id="findByIdAndTeacherId" resultMap="ReservationResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE id = #{id} AND teacher_id = #{teacherId}
+    </select>
+
+    <select id="findByUserIdAndState" resultMap="ReservationResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE user_id = #{userId} AND state = #{state}
+        ORDER BY start_time DESC
+    </select>
+
+    <select id="findByTeacherIdAndState" resultMap="ReservationResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE teacher_id = #{teacherId} AND state = #{state}
+        ORDER BY start_time ASC
+    </select>
+
+    <select id="findUpcomingByUserId" resultMap="ReservationResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE user_id = #{userId}
+        AND state = 'CONFIRMED'
+        AND start_time &gt; NOW()
+        ORDER BY start_time ASC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        <include refid="tableName"/>
+        (user_id, teacher_id, subject_id, start_time, duration, state)
+        VALUES
+        (#{userId}, #{teacherId}, #{subjectId}, #{startTime}, #{duration}, #{state})
+    </insert>
+
+    <update id="updateState">
+        UPDATE
+        <include refid="tableName"/>
+        SET state = #{state}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 预约前学生检查时间段是否冲突 -->
+    <select id="existsConflict" resultType="boolean">
+        SELECT EXISTS(
+        SELECT 1 FROM reservation
+        WHERE teacher_id = #{teacherId}
+        AND state = 'CONFIRMED'
+        AND (
+        (start_time &lt; #{endTime}) AND (DATE_ADD(start_time, INTERVAL duration MINUTE) &gt; #{startTime})
+        )
+        )
+    </select>
+
+    <select id="getExpiredPendingReservations" resultMap="ReservationResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE state = 'PENDING'
+        AND start_time &lt;= NOW()
+    </select>
+</mapper>
