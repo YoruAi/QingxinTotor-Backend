@@ -11,8 +11,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Validated
 @RestController
@@ -24,10 +27,31 @@ public class StudyPlanController {
 
     /*
     @RequireStudent
+    GET     /all?subjectName=数学
+    GET     /:id
     POST    /      -- create(return)
     PUT     /:id   -- update
     DELETE  /:id   -- delete/completed
      */
+    @RequireStudent
+    @GetMapping("/all")
+    public ApiResult<List<StudyPlanInfoResult>> getStudyPlans(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                              @RequestParam(required = false) String subjectName) {
+        if (StringUtils.hasText(subjectName))
+            return ApiResult.success(studyPlanService.listAllBySubjectName(userDetails.getUser().getId(), subjectName));
+        else
+            return ApiResult.success(studyPlanService.listAll(userDetails.getUser().getId()));
+    }
+
+    @RequireStudent
+    @GetMapping("/{id}")
+    public ApiResult<StudyPlanInfoResult> getStudyPlanById(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                           @PathVariable("id")
+                                                           @Min(value = 1, message = "Id must be a positive number")
+                                                           Long id) {
+        return ApiResult.success(studyPlanService.findById(userDetails.getUser().getId(), id));
+    }
+
     @RequireStudent
     @PostMapping
     public ApiResult<StudyPlanInfoResult> createStudyPlan(

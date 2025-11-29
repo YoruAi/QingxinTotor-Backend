@@ -6,21 +6,16 @@ import com.yoru.qingxintutor.filter.CustomUserDetails;
 import com.yoru.qingxintutor.pojo.ApiResult;
 import com.yoru.qingxintutor.pojo.dto.request.TeacherSearchRequest;
 import com.yoru.qingxintutor.pojo.dto.request.TeacherUpdateRequest;
-import com.yoru.qingxintutor.pojo.entity.SubjectEntity;
-import com.yoru.qingxintutor.pojo.entity.TeacherReviewEntity;
 import com.yoru.qingxintutor.pojo.result.TeacherInfoResult;
 import com.yoru.qingxintutor.service.AvatarService;
 import com.yoru.qingxintutor.service.TeacherService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Validated
 @RestController
@@ -63,22 +58,8 @@ public class TeacherController {
         return ApiResult.success(teacherService.search(text, pageNum, pageSize));
     }
 
-    @GetMapping("/{teacherId}/reviews")
-    public ApiResult<PageInfo<TeacherReviewEntity>> getTeacherReviews(@PathVariable("teacherId")
-                                                                      @Min(value = 1, message = "TeacherId must be a positive number")
-                                                                      Long teacherId,
-                                                                      @RequestParam(defaultValue = "1") Integer pageNum,
-                                                                      @RequestParam(defaultValue = "6") Integer pageSize) {
-        return ApiResult.success(teacherService.getReviewsById(teacherId, pageNum, pageSize));
-    }
 
-    @GetMapping("/{teacherId}/subjects")
-    public ApiResult<List<SubjectEntity>> getTeacherSubjects(@PathVariable("teacherId")
-                                                             @Min(value = 1, message = "TeacherId must be a positive number")
-                                                             Long teacherId) {
-        return ApiResult.success(teacherService.getSubjectsById(teacherId));
-    }
-
+    // Teacher Info
     @RequireTeacher
     @GetMapping("/me")
     public ApiResult<TeacherInfoResult> getProfiles(@AuthenticationPrincipal CustomUserDetails userDetails) {

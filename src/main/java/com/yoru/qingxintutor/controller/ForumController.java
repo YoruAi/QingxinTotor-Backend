@@ -28,12 +28,18 @@ public class ForumController {
     private ForumService forumService;
 
     /*
+    GET     /messages               -- 查找用户发送的所有消息
     GET     /message/{id}           -- 根据 ID 获取某条论坛消息（公开）
     POST    /{forumId}/message      -- 在指定论坛发布新消息
     GET     /{forumId}/messages     -- 获取指定论坛的所有消息
     GET     /all                    -- 获取所有论坛列表
     GET     /{forumId}              -- 根据 ID 获取论坛详情
      */
+    @GetMapping("/messages")
+    public ApiResult<List<ForumMessageInfoResult>> getMessages(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResult.success(forumMessageService.listAllByUserId(userDetails.getUser().getId()));
+    }
+
     @GetMapping("/message/{id}")
     public ApiResult<ForumMessageInfoResult> getMessage(@PathVariable
                                                         @Min(value = 1, message = "Id must be a positive number")

@@ -1,6 +1,9 @@
 package com.yoru.qingxintutor.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.yoru.qingxintutor.exception.BusinessException;
+import com.yoru.qingxintutor.mapper.TeacherMapper;
 import com.yoru.qingxintutor.mapper.TeacherReviewMapper;
 import com.yoru.qingxintutor.pojo.dto.request.ReviewCreateRequest;
 import com.yoru.qingxintutor.pojo.dto.request.ReviewUpdateRequest;
@@ -18,8 +21,15 @@ public class ReviewService {
 
     @Autowired
     private TeacherReviewMapper reviewMapper;
+
     @Autowired
     private TeacherService teacherService;
+
+    @Autowired
+    private TeacherMapper teacherMapper;
+
+    @Autowired
+    private TeacherReviewMapper teacherReviewMapper;
 
     public List<ReviewInfoResult> listAllByUserId(String userId) {
         return reviewMapper.findByUserId(userId)
@@ -32,6 +42,18 @@ public class ReviewService {
         TeacherReviewEntity review = reviewMapper.findById(id)
                 .orElseThrow(() -> new BusinessException("Review not found"));
         return entityToResult(review, teacherService.getNameById(review.getTeacherId()));
+    }
+
+    /**
+     * 根据id查询该教师所有评论
+     */
+    public PageInfo<TeacherReviewEntity> findReviewsByTeacherId(Long teacherId, Integer pageNum, Integer pageSize)
+            throws BusinessException {
+        if (!teacherMapper.existsById(teacherId))
+            throw new BusinessException("Teacher not found");
+        PageHelper.startPage(pageNum, pageSize);
+        List<TeacherReviewEntity> list = teacherReviewMapper.findByTeacherId(teacherId);
+        return new PageInfo<>(list);
     }
 
     @Transactional
