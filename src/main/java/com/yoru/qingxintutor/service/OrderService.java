@@ -104,12 +104,14 @@ public class OrderService {
                 .orElseThrow(() -> new BusinessException("Reservation not found"));
         if (reservation.getState() != ReservationEntity.State.PENDING)
             throw new BusinessException("Order cant be paid because reservation has been confirmed/canceled");
-        if (order.getState() == UserOrderEntity.State.PAID) {
+
+        UserOrderEntity.State state = order.getState();
+        if (state == UserOrderEntity.State.PAID) {
             throw new BusinessException("You have paid the order");
-        } else if (order.getState() == UserOrderEntity.State.PENDING) {
+        } else if (state == UserOrderEntity.State.PENDING) {
             orderMapper.updateState(id, UserOrderEntity.State.PAID);
             walletService.deductBalance(userId, order.getPrice().multiply(BigDecimal.valueOf(order.getQuantity())));
-        } else if (order.getState() == UserOrderEntity.State.CANCELED) {
+        } else if (state == UserOrderEntity.State.CANCELED) {
             throw new BusinessException("Order has been canceled");
         } else {
             throw new BusinessException("Unknown order state");
@@ -127,12 +129,13 @@ public class OrderService {
         if (reservation.getState() != ReservationEntity.State.PENDING)
             throw new BusinessException("Order cant be canceled because reservation has been confirmed/canceled");
 
-        if (order.getState() == UserOrderEntity.State.PAID) {
+        UserOrderEntity.State state = order.getState();
+        if (state == UserOrderEntity.State.PAID) {
             orderMapper.updateState(id, UserOrderEntity.State.CANCELED);
             walletService.addBalance(order.getUserId(), order.getPrice().multiply(BigDecimal.valueOf(order.getQuantity())));
-        } else if (order.getState() == UserOrderEntity.State.PENDING) {
+        } else if (state == UserOrderEntity.State.PENDING) {
             orderMapper.updateState(id, UserOrderEntity.State.CANCELED);
-        } else if (order.getState() == UserOrderEntity.State.CANCELED) {
+        } else if (state == UserOrderEntity.State.CANCELED) {
             throw new BusinessException("You have canceled the order");
         } else {
             throw new BusinessException("Unknown order state");

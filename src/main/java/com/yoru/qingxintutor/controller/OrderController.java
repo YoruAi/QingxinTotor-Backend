@@ -35,6 +35,7 @@ public class OrderController {
     PUT	    /api/order/{id}/cancel	教师	教师取消某订单（仅 PENDING 状态）→ CANCELLED
     限制：一旦预约进入 CONFIRMED，禁止再创建新订单。
      */
+    
     // 教师或学生 查询用户所有订单（可选按 reservationId 或 state 过滤）
     @GetMapping
     public ApiResult<List<OrderInfoResult>> listOrders(
@@ -45,9 +46,10 @@ public class OrderController {
             @RequestParam(required = false)
             UserOrderEntity.State state) {
         List<OrderInfoResult> result;
-        if (userDetails.getUser().getRole() == UserEntity.Role.TEACHER)
+        UserEntity.Role role = userDetails.getUser().getRole();
+        if (role == UserEntity.Role.TEACHER)
             result = orderService.listTeacherOrders(userDetails.getUser().getId(), reservationId, state);
-        else if (userDetails.getUser().getRole() == UserEntity.Role.STUDENT)
+        else if (role == UserEntity.Role.STUDENT)
             result = orderService.listStudentOrders(userDetails.getUser().getId(), reservationId, state);
         else
             throw new BusinessException("Unknown role");
@@ -61,9 +63,10 @@ public class OrderController {
                                                @Min(value = 1, message = "Id must be a positive number")
                                                Long id) {
         OrderInfoResult result;
-        if (userDetails.getUser().getRole() == UserEntity.Role.TEACHER)
+        UserEntity.Role role = userDetails.getUser().getRole();
+        if (role == UserEntity.Role.TEACHER)
             result = orderService.getTeacherOrder(userDetails.getUser().getId(), id);
-        else if (userDetails.getUser().getRole() == UserEntity.Role.STUDENT)
+        else if (role == UserEntity.Role.STUDENT)
             result = orderService.getStudentOrder(userDetails.getUser().getId(), id);
         else
             throw new BusinessException("Unknown role");

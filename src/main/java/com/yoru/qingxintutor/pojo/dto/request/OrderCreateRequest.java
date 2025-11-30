@@ -24,6 +24,6 @@ public class OrderCreateRequest {
 
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.00", message = "Price must be between 0 and 2000")
-    @DecimalMax(value = "2000.00", message = "Rating must be between 0 and 2000")
+    @DecimalMax(value = "2000.00", message = "Price must be between 0 and 2000")
     private BigDecimal price;
 }
