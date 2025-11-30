@@ -113,11 +113,11 @@
         AND create_time &lt;= DATE_SUB(NOW(), INTERVAL 15 MINUTE)
     </update>
 
-    <select id="areAllOrdersPaid" resultType="boolean">
+    <select id="hasNoPendingOrders" resultType="boolean">
         SELECT NOT EXISTS (
         SELECT 1 FROM user_order
         WHERE reservation_id = #{reservationId}
-        AND state != 'PAID'
+        AND state = 'PENDING'
         )
     </select>
 

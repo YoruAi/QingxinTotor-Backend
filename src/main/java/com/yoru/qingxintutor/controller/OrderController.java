@@ -32,10 +32,10 @@ public class OrderController {
     GET	    /api/order/{id}	用户	查看订单详情
     GET	    /api/orders	用户	查询本人所有订单（可按 reservation_id 过滤）
     PUT	    /api/order/{id}/pay	用户	支付订单（→ PAID，扣钱包余额）
-    PUT	    /api/order/{id}/cancel	教师	教师取消某订单（仅 PENDING 状态）→ CANCELLED
+    PUT	    /api/order/{id}/cancel	用户/教师	取消某订单（仅 PENDING 状态）→ CANCELLED
     限制：一旦预约进入 CONFIRMED，禁止再创建新订单。
      */
-    
+
     // 教师或学生 查询用户所有订单（可选按 reservationId 或 state 过滤）
     @GetMapping
     public ApiResult<List<OrderInfoResult>> listOrders(
@@ -97,14 +97,19 @@ public class OrderController {
         return ApiResult.success();
     }
 
-    // 教师 取消订单
-    @RequireTeacher
+    // 学生/教师 取消订单
     @PutMapping("/{id}/cancel")
     public ApiResult<Void> cancelOrder(@AuthenticationPrincipal CustomUserDetails userDetails,
                                        @PathVariable
                                        @Min(value = 1, message = "Id must be a positive number")
                                        Long id) {
-        orderService.cancelOrder(userDetails.getUser().getId(), id);
+        UserEntity.Role role = userDetails.getUser().getRole();
+        if (role == UserEntity.Role.TEACHER)
+            orderService.cancelOrderByTeacher(userDetails.getUser().getId(), id);
+        else if (role == UserEntity.Role.STUDENT)
+            orderService.cancelOrderByStudent(userDetails.getUser().getId(), id);
+        else
+            throw new BusinessException("Unknown role");
         return ApiResult.success();
     }
 }

@@ -55,9 +55,9 @@ public interface UserOrderMapper {
     int cancelExpiredPendingOrders();
 
     /**
-     * 检查某个预约下的所有订单是否均已支付（状态为 PAID）
+     * 检查某个预约下的所有订单是否均已支付
      */
-    boolean areAllOrdersPaid(@Param("reservationId") Long reservationId);
+    boolean hasNoPendingOrders(@Param("reservationId") Long reservationId);
 
     List<UserOrderEntity> selectOrdersByTeacherId(
             @Param("teacherId") Long teacherId,
