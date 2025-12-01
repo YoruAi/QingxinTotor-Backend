@@ -129,6 +129,35 @@ public class EmailUtils {
         sendHtml(to, subject, html);
     }
 
+    /**
+     * 发送学习计划到期提醒邮件给学生
+     */
+    @Async
+    public void sendStudyPlanReminderToStudent(
+            String to,
+            String studentName,
+            String planTitle,
+            String planContent,
+            LocalDateTime targetCompletionTime) {
+        String subject = "【Qingxin Tutor】学习计划提醒";
+        String html = buildStudyPlanReminderHtml(studentName, planTitle, planContent, targetCompletionTime);
+        sendHtml(to, subject, html);
+    }
+
+
+    private String buildStudyPlanReminderHtml(
+            String studentName,
+            String planTitle,
+            String planContent,
+            LocalDateTime targetCompletionTime) {
+        String targetCompletionTimeStr = targetCompletionTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        Context context = new Context();
+        context.setVariable("studentName", studentName);
+        context.setVariable("title", planTitle);
+        context.setVariable("content", planContent);
+        context.setVariable("targetCompletionTime", targetCompletionTimeStr);
+        return templateEngine.process("email/studyplan-reminder", context);
+    }
 
     private String buildCourseCompletedHtml(
             String studentName,

@@ -48,4 +48,9 @@ public interface UserStudyPlanMapper {
      * 根据用户ID和标题查找学习计划ID
      */
     Optional<Long> findByUserIdAndTitle(@Param("userId") String userId, @Param("title") String title);
+
+    /**
+     * 查找需要提醒的学习计划
+     */
+    List<UserStudyPlanEntity> findPlansToRemind();
 }

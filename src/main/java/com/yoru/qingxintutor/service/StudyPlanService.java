@@ -2,26 +2,44 @@ package com.yoru.qingxintutor.service;
 
 import com.yoru.qingxintutor.exception.BusinessException;
 import com.yoru.qingxintutor.mapper.SubjectMapper;
+import com.yoru.qingxintutor.mapper.UserMapper;
 import com.yoru.qingxintutor.mapper.UserStudyPlanMapper;
 import com.yoru.qingxintutor.pojo.dto.request.StudyPlanCreateRequest;
 import com.yoru.qingxintutor.pojo.dto.request.StudyPlanUpdateRequest;
 import com.yoru.qingxintutor.pojo.entity.SubjectEntity;
+import com.yoru.qingxintutor.pojo.entity.UserEntity;
 import com.yoru.qingxintutor.pojo.entity.UserStudyPlanEntity;
 import com.yoru.qingxintutor.pojo.result.StudyPlanInfoResult;
+import com.yoru.qingxintutor.utils.EmailUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 public class StudyPlanService {
+
+    @Autowired
+    private UserMapper userMapper;
+
     @Autowired
     private UserStudyPlanMapper studyPlanMapper;
 
     @Autowired
     private SubjectMapper subjectMapper;
+
+    @Autowired
+    private NotificationService notificationService;
+
+    @Autowired
+    private EmailUtils emailUtils;
 
     public List<StudyPlanInfoResult> listAll(String userId) {
         return studyPlanMapper.findByUserId(userId)
@@ -125,6 +143,30 @@ public class StudyPlanService {
         if (!userId.equals(studyPlan.getUserId()))
             throw new BusinessException("Study plan not found");
         studyPlanMapper.deleteById(id);
+    }
+
+    // 定时任务 - 提醒学习计划
+    @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
+    public void checkAndSendReminders() {
+        List<UserStudyPlanEntity> plans = studyPlanMapper.findPlansToRemind();
+        for (UserStudyPlanEntity plan : plans) {
+            try {
+                UserEntity student = userMapper.findById(plan.getUserId())
+                        .orElseThrow(() -> new BusinessException("User not found"));
+                String title = "学习计划提醒";
+                String content = String.format("学习计划提醒: [计划标题] %s, [计划内容] %s, [计划完成时间] %s, [科目] %s",
+                        plan.getTitle(), plan.getContent(),
+                        plan.getTargetCompletionTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd/HH:mm")),
+                        subjectMapper.findById(plan.getSubjectId()).map(SubjectEntity::getSubjectName).orElse("Unknown"));
+                notificationService.createPersonalNotification(plan.getUserId(), title, content);
+                emailUtils.sendStudyPlanReminderToStudent(student.getEmail(), student.getUsername(),
+                        plan.getTitle(), plan.getContent(), plan.getTargetCompletionTime());
+                log.debug("Scheduled task: success to send studyplan reminder for plan ID: {}", plan.getId());
+            } catch (Exception e) {
+                log.error("Failed to send reminder for plan ID: {}, {}", plan.getId()
+                        , e.getMessage());
+            }
+        }
     }
 
 

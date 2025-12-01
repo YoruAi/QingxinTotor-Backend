@@ -105,4 +105,13 @@
         <include refid="tableName"/>
         WHERE user_id = #{userId} AND title = #{title}
     </select>
+
+    <select id="findPlansToRemind" resultMap="UserStudyPlanResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE reminder_time &lt;= NOW()
+        AND reminder_time > DATE_SUB(NOW(), INTERVAL 1 MINUTE)
+    </select>
 </mapper>
