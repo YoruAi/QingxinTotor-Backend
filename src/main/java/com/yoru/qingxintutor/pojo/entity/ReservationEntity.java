@@ -14,11 +14,14 @@ import java.time.LocalDateTime;
 public class ReservationEntity {
     private Long id;                // BIGINT AUTO_INCREMENT PRIMARY KEY
     private String userId;          // CHAR(36) NOT NULL, REFERENCES user(id)
-    private String teacherId;       // CHAR(36) NOT NULL, REFERENCES teacher(user_id)
+    private Long teacherId;         // BIGINT NOT NULL, REFERENCES teacher(id)
     private Long subjectId;         // BIGINT NOT NULL, REFERENCES subject(id)
     private LocalDateTime startTime; // DATETIME NOT NULL
     private Integer duration;       // INT NOT NULL, 单位：分钟
-    private String state;           // VARCHAR(20) NOT NULL (e.g., PENDING, CONFIRMED, CANCELLED)
+    private State state;           // enum NOT NULL
     private LocalDateTime createTime;
-    private LocalDateTime updateTime;
+
+    public enum State {
+        PENDING, CONFIRMED, COMPLETED, CANCELED
+    }
 }

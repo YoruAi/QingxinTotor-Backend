@@ -51,7 +51,10 @@
         <include refid="allColumns"/>
         FROM
         <include refid="tableName"/>
-        WHERE user_id = #{userId} AND state = #{state}
+        WHERE user_id = #{userId}
+        <if test="state != null">
+            AND state = #{state}
+        </if>
         ORDER BY start_time DESC
     </select>
 
@@ -60,18 +63,10 @@
         <include refid="allColumns"/>
         FROM
         <include refid="tableName"/>
-        WHERE teacher_id = #{teacherId} AND state = #{state}
-        ORDER BY start_time ASC
-    </select>
-
-    <select id="findUpcomingByUserId" resultMap="ReservationResultMap">
-        SELECT
-        <include refid="allColumns"/>
-        FROM
-        <include refid="tableName"/>
-        WHERE user_id = #{userId}
-        AND state = 'CONFIRMED'
-        AND start_time &gt; NOW()
+        WHERE teacher_id = #{teacherId}
+        <if test="state != null">
+            AND state = #{state}
+        </if>
         ORDER BY start_time ASC
     </select>
 
@@ -92,13 +87,12 @@
 
     <!-- 预约前学生检查时间段是否冲突 -->
     <select id="existsConflict" resultType="boolean">
-        SELECT EXISTS(
+        SELECT EXISTS (
         SELECT 1 FROM reservation
         WHERE teacher_id = #{teacherId}
         AND state = 'CONFIRMED'
-        AND (
-        (start_time &lt; #{endTime}) AND (DATE_ADD(start_time, INTERVAL duration MINUTE) &gt; #{startTime})
-        )
+        AND start_time &lt; #{endTime}
+        AND DATE_ADD(start_time, INTERVAL duration MINUTE) &gt; #{startTime}
         )
     </select>
 
@@ -109,5 +103,26 @@
         <include refid="tableName"/>
         WHERE state = 'PENDING'
         AND start_time &lt;= NOW()
+    </select>
+
+    <select id="getReservationsReadyForCompletion" resultType="com.yoru.qingxintutor.pojo.entity.ReservationEntity">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE state = 'CONFIRMED'
+        AND DATE_ADD(DATE_ADD(start_time, INTERVAL duration MINUTE), INTERVAL 12 HOUR) &lt;= NOW()
+    </select>
+
+    <select id="findReservationsStartingInNext10Minutes"
+            resultType="com.yoru.qingxintutor.pojo.entity.ReservationEntity">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE
+        state = 'CONFIRMED'
+        AND start_time >= DATE_ADD(NOW(), INTERVAL 9 MINUTE)
+        AND start_time &lt; DATE_ADD(NOW(), INTERVAL 10 MINUTE)
     </select>
 </mapper>

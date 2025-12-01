@@ -129,17 +129,7 @@ public class OrderService {
         if (reservation.getState() != ReservationEntity.State.PENDING)
             throw new BusinessException("Order cant be canceled because reservation has been confirmed/canceled");
 
-        UserOrderEntity.State state = order.getState();
-        if (state == UserOrderEntity.State.PAID) {
-            orderMapper.updateState(id, UserOrderEntity.State.CANCELED);
-            walletService.addBalance(order.getUserId(), order.getPrice().multiply(BigDecimal.valueOf(order.getQuantity())));
-        } else if (state == UserOrderEntity.State.PENDING) {
-            orderMapper.updateState(id, UserOrderEntity.State.CANCELED);
-        } else if (state == UserOrderEntity.State.CANCELED) {
-            throw new BusinessException("The order has been canceled");
-        } else {
-            throw new BusinessException("Unknown order state");
-        }
+        cancelOrder(order);
     }
 
     @Transactional
@@ -151,26 +141,32 @@ public class OrderService {
         if (reservation.getState() != ReservationEntity.State.PENDING)
             throw new BusinessException("Order cant be canceled because reservation has been confirmed/canceled");
 
-        UserOrderEntity.State state = order.getState();
-        if (state == UserOrderEntity.State.PAID) {
-            orderMapper.updateState(id, UserOrderEntity.State.CANCELED);
-            walletService.addBalance(order.getUserId(), order.getPrice().multiply(BigDecimal.valueOf(order.getQuantity())));
-        } else if (state == UserOrderEntity.State.PENDING) {
-            orderMapper.updateState(id, UserOrderEntity.State.CANCELED);
-        } else if (state == UserOrderEntity.State.CANCELED) {
-            throw new BusinessException("The order has been canceled");
-        } else {
-            throw new BusinessException("Unknown order state");
-        }
+        cancelOrder(order);
     }
 
-    // 定时任务：取消超时未支付订单
+    // 定时任务 - 取消超时未支付订单
     @Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
     @Transactional
     public void cancelExpiredPendingOrders() {
         orderMapper.cancelExpiredPendingOrders();
     }
 
+    
+    @Transactional
+    public void cancelOrder(UserOrderEntity order) {
+        UserOrderEntity.State state = order.getState();
+        Long orderId = order.getId();
+        if (state == UserOrderEntity.State.PAID) {
+            orderMapper.updateState(orderId, UserOrderEntity.State.CANCELED);
+            walletService.addBalance(order.getUserId(), order.getPrice().multiply(BigDecimal.valueOf(order.getQuantity())));
+        } else if (state == UserOrderEntity.State.PENDING) {
+            orderMapper.updateState(orderId, UserOrderEntity.State.CANCELED);
+        } else if (state == UserOrderEntity.State.CANCELED) {
+            throw new BusinessException("The order has been canceled");
+        } else {
+            throw new BusinessException("Unknown order state");
+        }
+    }
 
     private static OrderInfoResult entityToResult(UserOrderEntity entity, String username) {
         return OrderInfoResult.builder()

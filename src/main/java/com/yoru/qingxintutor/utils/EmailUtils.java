@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Slf4j
 @Component
 public class EmailUtils {
@@ -64,6 +67,37 @@ public class EmailUtils {
         sendHtml(to, subject, html);
     }
 
+    /**
+     * 发送课程开始通知邮件
+     */
+    @Async
+    public void sendLessonReminder(String to,
+                                   String studentName,
+                                   String teacherName,
+                                   LocalDateTime startTime,
+                                   Integer durationMinutes) {
+        String subject = "【Qingxin Tutor】课程开始通知";
+        String html = buildLessonReminderHtml(studentName,
+                teacherName,
+                startTime,
+                durationMinutes.toString());
+        sendHtml(to, subject, html);
+    }
+
+    private String buildLessonReminderHtml(
+            String studentName,
+            String teacherName,
+            LocalDateTime startTime,
+            String durationMinutes) {
+        String startTimeString = startTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        Context context = new Context();
+        context.setVariable("studentName", studentName);
+        context.setVariable("teacherName", teacherName);
+        context.setVariable("startTime", startTimeString);
+        context.setVariable("durationMinutes", durationMinutes);
+        return templateEngine.process("email/lesson-reminder", context);
+    }
+
     private String buildRegisterSuccessHtml(String username) {
         Context context = new Context();
         context.setVariable("username", username);
@@ -99,13 +133,13 @@ public class EmailUtils {
     }
 
     /**
-     * 发送 HTML 邮件（推荐用于验证码）
+     * 发送 HTML 邮件
      *
      * @param to      收件人邮箱
      * @param subject 邮件主题
      * @param html    邮件正文（HTML 格式）
      */
-    public void sendHtml(String to, String subject, String html) {
+    private void sendHtml(String to, String subject, String html) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -119,5 +153,4 @@ public class EmailUtils {
             log.error("Email(html) send error. to={}, subject={}, error: {}", to, subject, e.getMessage());
         }
     }
-
 }
