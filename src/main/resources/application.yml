@@ -8,7 +8,7 @@ spring:
     name: QingxinTutor
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_URL}
+    url: jdbc:mysql://localhost:3306/db_qingxin_tutor
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   mail:
@@ -38,14 +38,14 @@ spring:
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
 app:
   jwt:
     secret: ${JWT_SECRET}
     expiration: 604800000  # ms
   upload:
     file-dir: ${UPLOAD_BASE_DIR}/QingxinTutor
-pagehelper:
-  helper-dialect: mysql
-  reasonable: true
-  support-methods-arguments: true
-  params: count=countSql
