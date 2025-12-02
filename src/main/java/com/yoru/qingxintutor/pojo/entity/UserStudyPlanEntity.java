@@ -21,6 +21,7 @@ public class UserStudyPlanEntity {
     private String content;         // TEXT
     private LocalDateTime targetCompletionTime; // DATETIME
     private LocalDateTime reminderTime;         // DATETIME
+    private Boolean completed;
     @JsonIgnore
     private LocalDateTime createTime;
 }

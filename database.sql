@@ -123,6 +123,7 @@ CREATE TABLE user_study_plan
     content                TEXT,
     target_completion_time DATETIME,
     reminder_time          DATETIME,
+    completed              BOOLEAN      NOT NULL DEFAULT FALSE,
     create_time            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_user_title (user_id, title),
     INDEX idx_user_id (user_id),

@@ -16,6 +16,7 @@
         content,
         target_completion_time,
         reminder_time,
+        completed,
         create_time
     </sql>
 
@@ -27,6 +28,7 @@
         <result property="content" column="content"/>
         <result property="targetCompletionTime" column="target_completion_time"/>
         <result property="reminderTime" column="reminder_time"/>
+        <result property="completed" column="completed"/>
         <result property="createTime" column="create_time"/>
     </resultMap>
 
@@ -44,6 +46,9 @@
         FROM
         <include refid="tableName"/>
         WHERE user_id = #{userId}
+        <if test="completed != null">
+            AND completed = #{completed}
+        </if>
         ORDER BY create_time DESC
     </select>
 
@@ -53,6 +58,9 @@
         FROM
         <include refid="tableName"/>
         WHERE user_id = #{userId} AND subject_id = #{subjectId}
+        <if test="completed != null">
+            AND completed = #{completed}
+        </if>
         ORDER BY create_time DESC
     </select>
 
@@ -83,6 +91,9 @@
             <if test="reminderTime != null">
                 reminder_time = #{reminderTime},
             </if>
+            <if test="completed != null">
+                completed = #{completed},
+            </if>
         </set>
         WHERE id = #{id}
     </update>
@@ -111,7 +122,8 @@
         <include refid="allColumns"/>
         FROM
         <include refid="tableName"/>
-        WHERE reminder_time &lt;= NOW()
+        WHERE completed = false
+        AND reminder_time &lt;= NOW()
         AND reminder_time > DATE_SUB(NOW(), INTERVAL 1 MINUTE)
     </select>
 </mapper>

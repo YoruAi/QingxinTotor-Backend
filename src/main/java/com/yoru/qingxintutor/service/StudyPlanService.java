@@ -41,8 +41,8 @@ public class StudyPlanService {
     @Autowired
     private EmailUtils emailUtils;
 
-    public List<StudyPlanInfoResult> listAll(String userId) {
-        return studyPlanMapper.findByUserId(userId)
+    public List<StudyPlanInfoResult> listAll(String userId, Boolean completed) {
+        return studyPlanMapper.findByUserId(userId, completed)
                 .stream()
                 .map(studyPlan -> entityToResult(studyPlan,
                         subjectMapper.findById(studyPlan.getSubjectId())
@@ -51,11 +51,12 @@ public class StudyPlanService {
                 .toList();
     }
 
-    public List<StudyPlanInfoResult> listAllBySubjectName(String userId, String subjectName) {
+    public List<StudyPlanInfoResult> listAllBySubjectName(String userId, String subjectName, Boolean completed) {
         return studyPlanMapper.findByUserIdAndSubjectId(userId,
                         subjectMapper.findBySubjectName(subjectName.trim())
                                 .orElseThrow(() -> new BusinessException("Subject not found"))
-                                .getId())
+                                .getId(),
+                        completed)
                 .stream()
                 .map(studyPlan -> entityToResult(studyPlan, subjectName.trim()))
                 .toList();
@@ -91,6 +92,7 @@ public class StudyPlanService {
                 .content(request.getContent())
                 .targetCompletionTime(request.getTargetCompletionTime())
                 .reminderTime(request.getReminderTime())
+                .completed(false)
                 .createTime(LocalDateTime.now())
                 .build();
         studyPlanMapper.insert(entity);
@@ -137,6 +139,17 @@ public class StudyPlanService {
                         .getSubjectName());
     }
 
+    public void complete(String userId, Long id) {
+        UserStudyPlanEntity studyPlan = studyPlanMapper.findById(id)
+                .orElseThrow(() -> new BusinessException("Study plan not found"));
+        if (!userId.equals(studyPlan.getUserId()))
+            throw new BusinessException("Study plan not found");
+        if (studyPlan.getCompleted())
+            throw new BusinessException("Study plan has been completed");
+        studyPlan.setCompleted(true);
+        studyPlanMapper.update(studyPlan);
+    }
+
     public void deleteById(String userId, Long id) {
         UserStudyPlanEntity studyPlan = studyPlanMapper.findById(id)
                 .orElseThrow(() -> new BusinessException("Study plan not found"));
@@ -178,6 +191,7 @@ public class StudyPlanService {
                 .content(entity.getContent())
                 .targetCompletionTime(entity.getTargetCompletionTime())
                 .reminderTime(entity.getReminderTime())
+                .completed(entity.getCompleted())
                 .build();
     }
 }

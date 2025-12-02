@@ -17,12 +17,13 @@ public interface UserStudyPlanMapper {
     /**
      * 根据用户 ID 查询所有学习计划（按创建时间倒序）
      */
-    List<UserStudyPlanEntity> findByUserId(String userId);
+    List<UserStudyPlanEntity> findByUserId(@Param("userId") String userId, @Param("completed") Boolean completed);
 
     /**
      * 根据用户 ID 和科目 ID 查询学习计划（按创建时间倒序）
      */
-    List<UserStudyPlanEntity> findByUserIdAndSubjectId(@Param("userId") String userId, @Param("subjectId") Long subjectId);
+    List<UserStudyPlanEntity> findByUserIdAndSubjectId(@Param("userId") String userId, @Param("subjectId") Long subjectId,
+                                                       @Param("completed") Boolean completed);
 
     /**
      * 插入新的学习计划，主键自增

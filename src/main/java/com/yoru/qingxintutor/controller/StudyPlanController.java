@@ -27,7 +27,7 @@ public class StudyPlanController {
 
     /*
     @RequireStudent
-    GET     /all?subjectName=数学
+    GET     /all?subjectName=数学?completed=false
     GET     /:id
     POST    /      -- create(return)
     PUT     /:id   -- update
@@ -35,12 +35,14 @@ public class StudyPlanController {
      */
     @RequireStudent
     @GetMapping("/all")
-    public ApiResult<List<StudyPlanInfoResult>> getStudyPlans(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                              @RequestParam(required = false) String subjectName) {
+    public ApiResult<List<StudyPlanInfoResult>> getStudyPlans(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(name = "subjectName", required = false) String subjectName,
+            @RequestParam(name = "completed", required = false) Boolean completed) {
         if (StringUtils.hasText(subjectName))
-            return ApiResult.success(studyPlanService.listAllBySubjectName(userDetails.getUser().getId(), subjectName));
+            return ApiResult.success(studyPlanService.listAllBySubjectName(userDetails.getUser().getId(), subjectName, completed));
         else
-            return ApiResult.success(studyPlanService.listAll(userDetails.getUser().getId()));
+            return ApiResult.success(studyPlanService.listAll(userDetails.getUser().getId(), completed));
     }
 
     @RequireStudent
@@ -71,6 +73,17 @@ public class StudyPlanController {
             @Valid @RequestBody StudyPlanUpdateRequest studyPlanUpdateRequest) {
         StudyPlanInfoResult result = studyPlanService.update(userDetails.getUser().getId(), id, studyPlanUpdateRequest);
         return ApiResult.success(result);
+    }
+
+    @RequireStudent
+    @PutMapping("/{id}/complete")
+    public ApiResult<StudyPlanInfoResult> completeStudyPlan(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable
+            @Min(value = 1, message = "Id must be a positive number")
+            Long id) {
+        studyPlanService.complete(userDetails.getUser().getId(), id);
+        return ApiResult.success();
     }
 
     @RequireStudent

@@ -18,4 +18,5 @@ public class StudyPlanInfoResult {
     private String content;
     private LocalDateTime targetCompletionTime;
     private LocalDateTime reminderTime;
+    private Boolean completed;
 }
