@@ -6,7 +6,6 @@ import com.yoru.qingxintutor.filter.CustomUserDetails;
 import com.yoru.qingxintutor.pojo.ApiResult;
 import com.yoru.qingxintutor.pojo.dto.request.ReviewCreateRequest;
 import com.yoru.qingxintutor.pojo.dto.request.ReviewUpdateRequest;
-import com.yoru.qingxintutor.pojo.entity.TeacherReviewEntity;
 import com.yoru.qingxintutor.pojo.result.ReviewInfoResult;
 import com.yoru.qingxintutor.service.ReviewService;
 import jakarta.validation.Valid;
@@ -78,11 +77,11 @@ public class ReviewController {
     }
 
     @GetMapping("/teacher/{teacherId}")
-    public ApiResult<PageInfo<TeacherReviewEntity>> getTeacherReviews(@PathVariable("teacherId")
-                                                                      @Min(value = 1, message = "TeacherId must be a positive number")
-                                                                      Long teacherId,
-                                                                      @RequestParam(defaultValue = "1") Integer pageNum,
-                                                                      @RequestParam(defaultValue = "6") Integer pageSize) {
+    public ApiResult<PageInfo<ReviewInfoResult>> getTeacherReviews(@PathVariable("teacherId")
+                                                                   @Min(value = 1, message = "TeacherId must be a positive number")
+                                                                   Long teacherId,
+                                                                   @RequestParam(defaultValue = "1") Integer pageNum,
+                                                                   @RequestParam(defaultValue = "6") Integer pageSize) {
         return ApiResult.success(reviewService.findReviewsByTeacherId(teacherId, pageNum, pageSize));
     }
 }

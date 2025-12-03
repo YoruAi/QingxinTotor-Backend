@@ -255,8 +255,8 @@ public class ReservationService {
                         String teacherName = teacherMapper.findNameById(reservation.getTeacherId())
                                 .orElseThrow(() -> new BusinessException("Teacher not found"));
                         notificationService.createPersonalNotification(reservation.getUserId(),
-                                "Lesson start reminder",
-                                "Your lesson will begin in ten minutes! Remember to attend lesson.");
+                                "课程开始提醒",
+                                "您的课程将在十分钟后开始! 请记得准时参加课程。");
                         emailUtils.sendLessonReminder(student.getEmail(),
                                 student.getUsername(),
                                 teacherName,

@@ -47,11 +47,14 @@ public class ReviewService {
     /**
      * 根据id查询该教师所有评论
      */
-    public PageInfo<TeacherReviewEntity> findReviewsByTeacherId(Long teacherId, Integer pageNum, Integer pageSize) {
+    public PageInfo<ReviewInfoResult> findReviewsByTeacherId(Long teacherId, Integer pageNum, Integer pageSize) {
         if (!teacherMapper.existsById(teacherId))
             throw new BusinessException("Teacher not found");
         PageHelper.startPage(pageNum, pageSize);
-        List<TeacherReviewEntity> list = teacherReviewMapper.findByTeacherId(teacherId);
+        List<ReviewInfoResult> list = teacherReviewMapper.findByTeacherId(teacherId)
+                .stream()
+                .map(entity -> entityToResult(entity, teacherService.getNameById(entity.getTeacherId())))
+                .toList();
         return new PageInfo<>(list);
     }
 

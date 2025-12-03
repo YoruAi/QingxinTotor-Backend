@@ -1,6 +1,7 @@
 package com.yoru.qingxintutor.pojo.dto.request;
 
 import com.yoru.qingxintutor.annotation.OptionalNotBlank;
+import com.yoru.qingxintutor.annotation.Username;
 import com.yoru.qingxintutor.annotation.ValidTimestamp;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
@@ -21,6 +22,7 @@ public class UserLoginRequest {
 
     @OptionalNotBlank(message = "Username cannot be composed of only whitespace characters")
     @Size(min = 1, max = 50, message = "Username must be between 1 and 50 characters")
+    @Username
     private String username;
 
     @OptionalNotBlank(message = "Email cannot be composed of only whitespace characters")

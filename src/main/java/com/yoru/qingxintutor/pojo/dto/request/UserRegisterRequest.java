@@ -1,6 +1,7 @@
 package com.yoru.qingxintutor.pojo.dto.request;
 
 import com.yoru.qingxintutor.annotation.StrongPassword;
+import com.yoru.qingxintutor.annotation.Username;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -15,6 +16,7 @@ import lombok.*;
 public class UserRegisterRequest {
     @NotBlank(message = "Username is required")
     @Size(max = 50, message = "Username must be shorter than 50 characters")
+    @Username
     private String username;
 
     @NotBlank(message = "Email is required")

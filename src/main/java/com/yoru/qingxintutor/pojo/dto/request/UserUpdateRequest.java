@@ -1,6 +1,7 @@
 package com.yoru.qingxintutor.pojo.dto.request;
 
 import com.yoru.qingxintutor.annotation.OptionalNotBlank;
+import com.yoru.qingxintutor.annotation.Username;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class UserUpdateRequest {
     @OptionalNotBlank(message = "Username cannot be composed of only whitespace characters")
     @Size(min = 1, max = 50, message = "Username must be between 1 and 50 characters")
+    @Username
     private String username;
 
     @OptionalNotBlank(message = "Nickname cannot be composed of only whitespace characters")
