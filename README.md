@@ -25,6 +25,42 @@ All entities are in com.yoru.qingxintutor.pojo.
 Completed function modules: Auth, Teacher/Student Role, Subjects, Teachers, Reservation & Orders, User, Wallet,
 Messages, Plans, AI insight.
 
+## 部署指南
+
+> 有基础的开发者可以选择修改配置并使用其他方案。
+
+1. 申请并配置163邮箱SMTP，填写邮箱账号与SMTP授权码；
+
+   `spring.mail.username`
+
+   `spring.mail.password`
+
+2. 创建数据库(MySQL)并填入数据库访问相关配置；
+
+   `spring.datasource.url`
+
+   `spring.datasource.username`
+
+   `spring.datasource.password`
+
+3. 申请 AI API，访问火山引擎 Ark 平台，开通模型并填入配置；
+
+   `app.ai.api-key`
+
+   `app.ai.base-url`
+
+   `app.ai.model`
+
+4. 设置JWT密钥。
+
+   `app.jwt.secret`
+
+5. 设置文件上传本地目录`UPLOAD_BASE_DIR`环境变量如`C:/Temp`。
+
+6. 使用Jasypt加密所有敏感值并设置`JASYPT_KEY`密钥环境变量与加密时使用的加密参数；
+
+   `jasypt.encryptor.**`
+
 If you want to revise or add some functions, be **careful** to use the unused mapper method because they are all
 unverified, there may be errors.
 

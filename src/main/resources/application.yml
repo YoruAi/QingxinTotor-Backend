@@ -29,7 +29,7 @@ spring:
         default-encoding: UTF-8
   servlet:
     multipart:
-      location: ${UPLOAD_BASE_DIR}/QingxinTutor/multipart-file
+      location: ${UPLOAD_BASE_DIR:${java.io.tmpdir}}/QingxinTutor/multipart-file
       max-file-size: 10MB
       max-request-size: 100MB
   jackson:
@@ -52,7 +52,7 @@ app:
     base-url: https://ark.cn-beijing.volces.com/api/v3
     model: doubao-seed-1-6-lite-251015
   upload:
-    file-dir: ${UPLOAD_BASE_DIR}/QingxinTutor
+    file-dir: ${UPLOAD_BASE_DIR:${java.io.tmpdir}}/QingxinTutor
 jasypt:
   encryptor:
     password: ${JASYPT_KEY}
