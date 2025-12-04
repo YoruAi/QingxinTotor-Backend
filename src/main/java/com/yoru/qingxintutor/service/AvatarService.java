@@ -5,12 +5,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -21,14 +21,18 @@ public class AvatarService {
 
     private static final String AVATAR_DIR = "avatar";
 
-    @SuppressWarnings("ExtractMethodRecommender")
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png");
+
     public String uploadAvatar(MultipartFile file) {
         // 1. 校验
         if (file.isEmpty()) {
             throw new BusinessException("Upload file is empty");
         }
-        File dir = new File(fileDir, AVATAR_DIR);
-        if (!dir.exists()) {
+        // 自动创建目录（包括父目录）
+        Path avatarDir = Paths.get(fileDir, AVATAR_DIR);
+        try {
+            Files.createDirectories(avatarDir);
+        } catch (IOException e) {
             throw new BusinessException("File dir not exists, please contact admin");
         }
 
@@ -37,13 +41,16 @@ public class AvatarService {
         String ext = "";
         //noinspection ConstantValue
         if (originalName != null && originalName.contains(".")) {
-            ext = originalName.substring(originalName.lastIndexOf("."));
+            ext = originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
+        }
+        if (!ALLOWED_EXTENSIONS.contains(ext)) {
+            throw new BusinessException("Unsupported file type");
         }
         String safeFileName = UUID.randomUUID() + ext;
 
         // 3. 保存文件
         try {
-            Path targetPath = Paths.get(fileDir, AVATAR_DIR, safeFileName);
+            Path targetPath = avatarDir.resolve(safeFileName);
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new BusinessException("Upload file error, please contact admin");
