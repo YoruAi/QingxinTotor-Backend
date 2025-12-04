@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.yoru.qingxintutor.exception.BusinessException;
 import com.yoru.qingxintutor.mapper.TeacherMapper;
 import com.yoru.qingxintutor.mapper.TeacherReviewMapper;
+import com.yoru.qingxintutor.mapper.UserMapper;
 import com.yoru.qingxintutor.pojo.dto.request.ReviewCreateRequest;
 import com.yoru.qingxintutor.pojo.dto.request.ReviewUpdateRequest;
 import com.yoru.qingxintutor.pojo.entity.TeacherReviewEntity;
@@ -31,17 +32,27 @@ public class ReviewService {
     @Autowired
     private TeacherReviewMapper teacherReviewMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     public List<ReviewInfoResult> listAllByUserId(String userId) {
+        String username = userMapper.findById(userId)
+                .orElseThrow(() -> new BusinessException("User not found"))
+                .getUsername();
         return reviewMapper.findByUserId(userId)
                 .stream()
-                .map(entity -> entityToResult(entity, teacherService.getNameById(entity.getTeacherId())))
+                .map(entity -> entityToResult(entity, username, teacherService.getNameById(entity.getTeacherId())))
                 .toList();
     }
 
     public ReviewInfoResult findById(Long id) {
         TeacherReviewEntity review = reviewMapper.findById(id)
                 .orElseThrow(() -> new BusinessException("Review not found"));
-        return entityToResult(review, teacherService.getNameById(review.getTeacherId()));
+        return entityToResult(review,
+                userMapper.findById(review.getUserId())
+                        .orElseThrow(() -> new BusinessException("User not found"))
+                        .getUsername(),
+                teacherService.getNameById(review.getTeacherId()));
     }
 
     /**
@@ -53,7 +64,9 @@ public class ReviewService {
         PageHelper.startPage(pageNum, pageSize);
         List<ReviewInfoResult> list = teacherReviewMapper.findByTeacherId(teacherId)
                 .stream()
-                .map(entity -> entityToResult(entity, teacherService.getNameById(entity.getTeacherId())))
+                .map(entity -> entityToResult(entity, userMapper.findById(entity.getUserId())
+                        .orElseThrow(() -> new BusinessException("User not found"))
+                        .getUsername(), teacherService.getNameById(entity.getTeacherId())))
                 .toList();
         return new PageInfo<>(list);
     }
@@ -78,7 +91,9 @@ public class ReviewService {
                 .build();
         reviewMapper.insert(entity);
 
-        return entityToResult(entity, teacherName);
+        return entityToResult(entity, userMapper.findById(entity.getUserId())
+                .orElseThrow(() -> new BusinessException("User not found"))
+                .getUsername(), teacherName);
     }
 
     public ReviewInfoResult update(String userId, Long id, ReviewUpdateRequest request) {
@@ -98,7 +113,9 @@ public class ReviewService {
 
         review = reviewMapper.findById(id)
                 .orElseThrow(() -> new BusinessException("Review not found"));
-        return entityToResult(review, teacherService.getNameById(review.getTeacherId()));
+        return entityToResult(review, userMapper.findById(review.getUserId())
+                .orElseThrow(() -> new BusinessException("User not found"))
+                .getUsername(), teacherService.getNameById(review.getTeacherId()));
     }
 
     public void deleteById(String userId, Long id) {
@@ -109,10 +126,11 @@ public class ReviewService {
         reviewMapper.deleteById(id);
     }
 
-    private static ReviewInfoResult entityToResult(TeacherReviewEntity entity, String teacherName) {
+    private static ReviewInfoResult entityToResult(TeacherReviewEntity entity, String username, String teacherName) {
         return ReviewInfoResult.builder()
                 .id(entity.getId())
                 .userId(entity.getUserId())
+                .username(username)
                 .teacherId(entity.getTeacherId())
                 .teacherName(teacherName)
                 .rating(entity.getRating())
