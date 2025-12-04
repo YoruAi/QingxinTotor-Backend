@@ -9,13 +9,13 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/db_qingxin_tutor
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: ENC(09LUbqP4f5OnCK7+UjRyYByGJLMyo72jS8tULPvu3L2004dMO4K94FuQzMYXggol)
+    password: ENC(3pfs9B7/cfOzSIfskDMZKHdXHs5y9Vrb5PzK5BBORHYDwoz2+6e496ndHQ3VFGR7)
   mail:
     host: smtp.163.com
     port: 465
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_SMTP_SECRET}
+    username: ENC(AwZyAZ3LAA5SqNJ4ubyRWYYS8lw9u9SOWXfVCAqhQS3pk2pt4s4+Q5A9KJiBm8tM)
+    password: ENC(B5hwxbqIjxHPW3Lt83xDrGUQ4ISvJSzEvePxzo160EueDNhoCCuSnqceoNBR/VXYaBgD3x3kaPPtxcdD1XgI8g==)
     properties:
       mail:
         smtp:
@@ -45,11 +45,19 @@ pagehelper:
   params: count=countSql
 app:
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ENC(Rr4MPfEWOCuVM2prCThw1Gje7zGgJCqAPufYrnyE+DDX1CRkwz8pgC8hNtF9xhWds8ZHTrCiQ4Z1GvNiCV3hqbzPEna8BAprkXmygfjobCI=)
     expiration: 604800000  # ms
   ai:
-    api-key: ${API_KEY}
+    api-key: ENC(OULibtYqvsFCpNJJIzrQpToRZgTklE0GTxCVV3o/4JOUY2MHdmtga+0eyVlG5POoeGaKVb7V9Ktzs3erP6M6u+N0OLDQ8+vc9O/aFU1bE3s=)
     base-url: https://ark.cn-beijing.volces.com/api/v3
     model: doubao-seed-1-6-lite-251015
   upload:
     file-dir: ${UPLOAD_BASE_DIR}/QingxinTutor
+jasypt:
+  encryptor:
+    password: ${JASYPT_KEY}
+    algorithm: PBEWITHHMACSHA512ANDAES_256
+    iv-generator-classname: org.jasypt.iv.RandomIvGenerator
+    salt-generator-classname: org.jasypt.salt.RandomSaltGenerator
+    provider-name: SunJCE
+    key-obtention-iterations: 10000
