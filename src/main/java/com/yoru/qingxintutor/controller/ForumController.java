@@ -47,6 +47,7 @@ public class ForumController {
         return ApiResult.success(forumMessageService.findById(id));
     }
 
+    @Deprecated
     @PostMapping("/{forumId}/message")
     public ApiResult<ForumMessageInfoResult> sendMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                          @PathVariable
