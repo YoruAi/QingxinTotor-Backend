@@ -2,7 +2,7 @@ spring:
   config:
     activate:
       on-profile: prod
-
 logging:
   level:
-    com.yoru.qingxintutor: warn
+    com.yoru.qingxintutor: debug
+    com.yoru.qingxintutor.mapper: warn
