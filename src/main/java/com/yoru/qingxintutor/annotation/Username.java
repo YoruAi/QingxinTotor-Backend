@@ -21,8 +21,8 @@ public @interface Username {
 }
 
 class ValidUsernameValidator implements ConstraintValidator<Username, String> {
-    // 只允许字母、数字、下划线，且长度至少1
-    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]+$");
+    // 只允许中文 + 字母 + 数字 + 常见安全符号
+    private static final Pattern USERNAME_PATTERN = Pattern.compile("^[\\w\\u4e00-\\u9fa5\\-.·]{1,50}$");
 
     @Override
     public boolean isValid(String username, ConstraintValidatorContext context) {
