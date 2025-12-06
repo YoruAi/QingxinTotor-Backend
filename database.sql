@@ -46,7 +46,11 @@ CREATE TABLE teacher
     description         TEXT,
     grade               TINYINT UNSIGNED        NOT NULL CHECK (grade BETWEEN 1 AND 9),
     create_time         DATETIME DEFAULT CURRENT_TIMESTAMP,
-    update_time         DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    update_time         DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_grade (grade),
+    INDEX idx_name (name),
+    INDEX idx_nickname (nickname),
+    INDEX idx_birth_date (birth_date)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -78,8 +82,7 @@ CREATE TABLE user_wallet
     balance     DECIMAL(12, 2) NOT NULL DEFAULT 0.00, -- 余额
     points      INT            NOT NULL DEFAULT 0,    -- 积分
     create_time DATETIME                DEFAULT CURRENT_TIMESTAMP,
-    update_time DATETIME                DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_user_id (user_id)
+    update_time DATETIME                DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -94,8 +97,9 @@ CREATE TABLE user_order
     price          DECIMAL(10, 2)                        NOT NULL DEFAULT 0.00,
     state          ENUM ('PENDING', 'PAID', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
     create_time    DATETIME                              NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_user_id (user_id),
-    INDEX idx_reservation_id (reservation_id)
+    INDEX idx_reservation_id (reservation_id),
+    INDEX idx_user_state (user_id, state),
+    INDEX idx_create_time (create_time)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -107,9 +111,9 @@ CREATE TABLE user_voucher
     amount      DECIMAL(10, 2) NOT NULL, -- 面额
     create_time DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expire_time DATETIME       NOT NULL,
-    UNIQUE KEY uk_user_money_create (user_id, amount, create_time),
     INDEX idx_user_id (user_id),
-    INDEX idx_expire_time (expire_time)
+    INDEX idx_expire_time (expire_time),
+    INDEX idx_create_time (create_time)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -126,8 +130,8 @@ CREATE TABLE user_study_plan
     completed              BOOLEAN      NOT NULL DEFAULT FALSE,
     create_time            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_user_title (user_id, title),
-    INDEX idx_user_id (user_id),
-    INDEX idx_subject_id (subject_id)
+    INDEX idx_subject_id (subject_id),
+    INDEX idx_create_time (create_time)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -144,7 +148,9 @@ CREATE TABLE reservation
     create_time DATETIME                                                NOT NULL DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_user_id (user_id),
     INDEX idx_teacher_id (teacher_id),
-    INDEX idx_start_time (start_time)
+    INDEX idx_start_time (start_time),
+    INDEX idx_state (state),
+    INDEX idx_create_time (create_time)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -159,8 +165,8 @@ CREATE TABLE teacher_review
     content     TEXT,
     create_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uk_user_teacher (user_id, teacher_id),
-    INDEX idx_user_id (user_id),
-    INDEX idx_teacher_id (teacher_id)
+    INDEX idx_teacher_id (teacher_id),
+    INDEX idx_create_time (create_time)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -172,7 +178,8 @@ CREATE TABLE app_feedback
     title       VARCHAR(100) NOT NULL,
     content     TEXT         NOT NULL,
     create_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_user_id (user_id)
+    INDEX idx_user_id (user_id),
+    INDEX idx_create_time (create_time)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -194,7 +201,7 @@ CREATE TABLE forum_message
     user_id     CHAR(36) NOT NULL,
     content     TEXT     NOT NULL,
     create_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_forum_id (forum_id),
+    INDEX idx_forum_time (forum_id, create_time),
     INDEX idx_create_time (create_time)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -207,7 +214,7 @@ CREATE TABLE notification
     title       VARCHAR(100) NOT NULL,
     content     TEXT         NOT NULL,
     create_time DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_user_id (user_id),
+    INDEX idx_user_time (user_id, create_time),
     INDEX idx_create_time (create_time)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
@@ -222,8 +229,7 @@ CREATE TABLE wallet_recharge_order
     state         ENUM ('PENDING', 'SUCCESS', 'FAILED') NOT NULL DEFAULT 'PENDING',
     create_time   DATETIME                              NOT NULL DEFAULT CURRENT_TIMESTAMP,
     complete_time DATETIME,
-    INDEX idx_user_id (user_id),
-    INDEX idx_out_trade_no (out_trade_no)
+    INDEX idx_user_id (user_id)
 ) ENGINE = InnoDB;
 
 -- 17. private_chats 师生私聊表
@@ -233,7 +239,8 @@ CREATE TABLE private_chats
     user_id     VARCHAR(36) NOT NULL, -- 学生ID
     teacher_id  BIGINT      NOT NULL, -- 老师ID
     create_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY unique_chat (user_id, teacher_id)
+    UNIQUE KEY unique_chat (user_id, teacher_id),
+    INDEX idx_teacher_id (teacher_id)
 );
 
 -- 18. private_messages 师生私聊信息表
@@ -243,7 +250,9 @@ CREATE TABLE private_messages
     chat_id     BIGINT                      NOT NULL,
     content     TEXT                        NOT NULL,
     sender      enum ('TEACHER', 'STUDENT') NOT NULL,
-    create_time DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    create_time DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_chat_time (chat_id, create_time),
+    INDEX idx_sender (chat_id, sender)
 );
 
 
