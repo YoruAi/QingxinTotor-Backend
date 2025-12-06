@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.yoru.qingxintutor.mapper.PrivateMessageMapper">
+    <sql id="tableName">
+        private_messages
+    </sql>
+
+    <sql id="allColumns">
+        id,
+        chat_id,
+        content,
+        sender,
+        create_time
+    </sql>
+
+    <resultMap id="PrivateMessageResultMap" type="com.yoru.qingxintutor.pojo.entity.PrivateMessageEntity">
+        <id column="id" property="id"/>
+        <result column="chat_id" property="chatId"/>
+        <result column="content" property="content"/>
+        <result column="sender" property="sender"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        <include refid="tableName"/>
+        (chat_id, content, sender
+        <if test="createTime != null">
+            , create_time
+        </if>
+        )
+        VALUES (#{chatId}, #{content}, #{sender}
+        <if test="createTime != null">
+            , #{createTime}
+        </if>
+        )
+    </insert>
+
+    <select id="findByChatId" resultMap="PrivateMessageResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE chat_id = #{chatId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findById" resultMap="PrivateMessageResultMap">
+        SELECT
+        <include refid="allColumns"/>
+        FROM
+        <include refid="tableName"/>
+        WHERE id = #{id}
+    </select>
+</mapper>

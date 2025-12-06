@@ -1,11 +1,10 @@
 package com.yoru.qingxintutor.websocket;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yoru.qingxintutor.config.SpringAwareConfigurator;
 import com.yoru.qingxintutor.pojo.dto.request.MessageCreateRequest;
-import com.yoru.qingxintutor.pojo.result.ForumMessageInfoResult;
-import com.yoru.qingxintutor.service.ForumMessageService;
+import com.yoru.qingxintutor.pojo.result.PrivateMessageInfoResult;
+import com.yoru.qingxintutor.service.PrivateChatService;
 import com.yoru.qingxintutor.utils.JwtUtils;
 import jakarta.websocket.*;
 import jakarta.websocket.server.HandshakeRequest;
@@ -23,23 +22,24 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
-@ServerEndpoint(value = "/ws/forum/{forumId}/message", configurator = SpringAwareConfigurator.class)
-public class ForumMessageWebSocket {
+@ServerEndpoint(value = "/ws/private-chat/{chatId}/message", configurator = SpringAwareConfigurator.class)
+public class PrivateChatWebSocket {
+
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
-    private ForumMessageService forumMessageService;
+    private PrivateChatService privateChatService;
 
     @Autowired
     private JwtUtils jwtUtils;
 
     private static final String USER_ID = "userId";
-    private static final Map<Long, Set<Session>> FORUM_SESSIONS = new ConcurrentHashMap<>();
+    private static final Map<Long, Set<Session>> PRIVATE_CHAT_SESSIONS = new ConcurrentHashMap<>();
 
     @OnOpen
-    public void onOpen(@PathParam("forumId") Long forumId, Session session, EndpointConfig config) {
+    public void onOpen(@PathParam("chatId") Long chatId, Session session, EndpointConfig config) {
         HandshakeRequest request = (HandshakeRequest) config.getUserProperties().get("httpRequest");
         if (request != null) {
             List<String> authHeaders = request.getHeaders().get("Authorization");
@@ -54,8 +54,8 @@ public class ForumMessageWebSocket {
             if (token != null && jwtUtils.validateToken(token)) {
                 String userId = jwtUtils.getUserIdFromToken(token);
                 session.getUserProperties().put(USER_ID, userId);
-                FORUM_SESSIONS.computeIfAbsent(forumId, k -> ConcurrentHashMap.newKeySet()).add(session);
-                log.debug("User {} authenticated websocket for forum {}", userId, forumId);
+                PRIVATE_CHAT_SESSIONS.computeIfAbsent(chatId, k -> ConcurrentHashMap.newKeySet()).add(session);
+                log.debug("User {} authenticated websocket for chat {}", userId, chatId);
                 return;
             }
         }
@@ -68,41 +68,41 @@ public class ForumMessageWebSocket {
     }
 
     @OnMessage
-    public void onMessage(String text, @PathParam("forumId") Long forumId, Session session) {
+    public void onMessage(String text, @PathParam("chatId") Long chatId, Session session) {
         try {
-            MessageCreateRequest forumMessageCreateRequest = objectMapper.readValue(text, MessageCreateRequest.class);
-            ForumMessageInfoResult msg = forumMessageService.insert((String) session.getUserProperties().get(USER_ID),
-                    forumId, forumMessageCreateRequest);
+            MessageCreateRequest messageCreateRequest = objectMapper.readValue(text, MessageCreateRequest.class);
+            PrivateMessageInfoResult msg = privateChatService.insert((String) session.getUserProperties().get(USER_ID),
+                    chatId, messageCreateRequest);
 
-            // 广播给同论坛所有人
+            // 广播给同对话所有人
             String response = objectMapper.writeValueAsString(msg);
-            broadcast(forumId, response);
+            broadcast(chatId, response);
         } catch (Exception e) {
             log.error("Failed when handle websocket message: {}", e.getMessage());
         }
     }
 
     @OnClose
-    public void onClose(@PathParam("forumId") Long forumId, Session session) {
-        Set<Session> sessions = FORUM_SESSIONS.get(forumId);
+    public void onClose(@PathParam("chatId") Long chatId, Session session) {
+        Set<Session> sessions = PRIVATE_CHAT_SESSIONS.get(chatId);
         if (sessions != null) {
             sessions.remove(session);
-            if (sessions.isEmpty()) FORUM_SESSIONS.remove(forumId);
+            if (sessions.isEmpty()) PRIVATE_CHAT_SESSIONS.remove(chatId);
         }
     }
 
     @OnError
-    public void onError(@PathParam("forumId") Long forumId, Session session, Throwable error) {
-        Set<Session> sessions = FORUM_SESSIONS.get(forumId);
+    public void onError(@PathParam("chatId") Long chatId, Session session, Throwable error) {
+        Set<Session> sessions = PRIVATE_CHAT_SESSIONS.get(chatId);
         if (sessions != null) {
             sessions.remove(session);
-            if (sessions.isEmpty()) FORUM_SESSIONS.remove(forumId);
+            if (sessions.isEmpty()) PRIVATE_CHAT_SESSIONS.remove(chatId);
         }
         log.error("WebSocket error: {}", error.getMessage());
     }
 
-    private void broadcast(Long forumId, String message) {
-        FORUM_SESSIONS.getOrDefault(forumId, Set.of())
+    private void broadcast(Long chatId, String message) {
+        PRIVATE_CHAT_SESSIONS.getOrDefault(chatId, Set.of())
                 .forEach(s -> {
                     try {
                         if (s.isOpen()) s.getBasicRemote().sendText(message);

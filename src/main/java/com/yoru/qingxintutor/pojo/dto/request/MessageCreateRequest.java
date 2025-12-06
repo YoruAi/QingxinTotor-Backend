@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ForumMessageCreateRequest {
+public class MessageCreateRequest {
     @NotBlank(message = "Content is required")
     @Size(max = 255, message = "Content must be between 1 and 255 characters")
     private String content;

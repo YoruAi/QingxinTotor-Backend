@@ -226,6 +226,26 @@ CREATE TABLE wallet_recharge_order
     INDEX idx_out_trade_no (out_trade_no)
 ) ENGINE = InnoDB;
 
+-- 17. private_chats 师生私聊表
+CREATE TABLE private_chats
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id     VARCHAR(36) NOT NULL, -- 学生ID
+    teacher_id  BIGINT      NOT NULL, -- 老师ID
+    create_time DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_chat (user_id, teacher_id)
+);
+
+-- 18. private_messages 师生私聊信息表
+CREATE TABLE private_messages
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    chat_id     BIGINT                      NOT NULL,
+    content     TEXT                        NOT NULL,
+    sender      enum ('TEACHER', 'STUDENT') NOT NULL,
+    create_time DATETIME                    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 
 -- DANGEROUS ZONE --
 -- 清空所有表

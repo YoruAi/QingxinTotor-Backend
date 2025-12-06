@@ -2,7 +2,7 @@ package com.yoru.qingxintutor.controller;
 
 import com.yoru.qingxintutor.filter.CustomUserDetails;
 import com.yoru.qingxintutor.pojo.ApiResult;
-import com.yoru.qingxintutor.pojo.dto.request.ForumMessageCreateRequest;
+import com.yoru.qingxintutor.pojo.dto.request.MessageCreateRequest;
 import com.yoru.qingxintutor.pojo.entity.ForumEntity;
 import com.yoru.qingxintutor.pojo.result.ForumMessageInfoResult;
 import com.yoru.qingxintutor.service.ForumMessageService;
@@ -53,7 +53,7 @@ public class ForumController {
                                                          @PathVariable
                                                          @Min(value = 1, message = "ForumId must be a positive number")
                                                          Long forumId,
-                                                         @Valid @RequestBody ForumMessageCreateRequest forumMessageCreateRequest) {
+                                                         @Valid @RequestBody MessageCreateRequest forumMessageCreateRequest) {
         ForumMessageInfoResult result = forumMessageService.insert(userDetails.getUser().getId(),
                 forumId, forumMessageCreateRequest);
         return ApiResult.success(result);
