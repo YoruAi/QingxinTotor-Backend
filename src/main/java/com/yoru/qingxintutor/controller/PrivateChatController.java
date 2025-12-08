@@ -1,6 +1,7 @@
 package com.yoru.qingxintutor.controller;
 
 import com.yoru.qingxintutor.annotation.auth.RequireStudent;
+import com.yoru.qingxintutor.exception.BusinessException;
 import com.yoru.qingxintutor.filter.CustomUserDetails;
 import com.yoru.qingxintutor.pojo.ApiResult;
 import com.yoru.qingxintutor.pojo.dto.request.MessageCreateRequest;
@@ -26,7 +27,6 @@ public class PrivateChatController {
     /*
     GET     /messages               -- 老师或学生 查找用户发送的所有消息
     GET     /message/{id}           -- 老师或学生 根据 ID 获取某条私聊消息（非公开）
-    POST    /{chatId}/message       -- 老师或学生 发起新消息（仅学生可创建对话）
     GET     /{chatId}/messages      -- 老师或学生 获取指定对话的所有消息
     GET     /all                    -- 老师或学生 获取所有对话列表
     GET     /{chatId}               -- 老师或学生 根据 ID 获取对胡详情
@@ -46,16 +46,14 @@ public class PrivateChatController {
         return ApiResult.success(privateChatService.findMessageById(userDetails.getUser().getId(), id));
     }
 
-    @Deprecated
+    @Deprecated(since = "2.0.0", forRemoval = true)
     @PostMapping("/{chatId}/message")
     public ApiResult<PrivateMessageInfoResult> sendMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                            @PathVariable
                                                            @Min(value = 1, message = "ChatId must be a positive number")
                                                            Long chatId,
                                                            @Valid @RequestBody MessageCreateRequest messageCreateRequest) {
-        PrivateMessageInfoResult result = privateChatService.insert(userDetails.getUser().getId(),
-                chatId, messageCreateRequest);
-        return ApiResult.success(result);
+        throw new BusinessException("The method is no longer supported");
     }
 
     @GetMapping("/{chatId}/messages")

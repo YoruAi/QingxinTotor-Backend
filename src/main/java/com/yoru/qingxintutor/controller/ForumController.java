@@ -1,5 +1,6 @@
 package com.yoru.qingxintutor.controller;
 
+import com.yoru.qingxintutor.exception.BusinessException;
 import com.yoru.qingxintutor.filter.CustomUserDetails;
 import com.yoru.qingxintutor.pojo.ApiResult;
 import com.yoru.qingxintutor.pojo.dto.request.MessageCreateRequest;
@@ -28,7 +29,6 @@ public class ForumController {
     /*
     GET     /messages               -- 查找用户发送的所有消息
     GET     /message/{id}           -- 根据 ID 获取某条论坛消息（公开）
-    POST    /{forumId}/message      -- 在指定论坛发布新消息
     GET     /{forumId}/messages     -- 获取指定论坛的所有消息
     GET     /all                    -- 获取所有论坛列表
     GET     /{forumId}              -- 根据 ID 获取论坛详情
@@ -45,16 +45,14 @@ public class ForumController {
         return ApiResult.success(forumMessageService.findById(id));
     }
 
-    @Deprecated
+    @Deprecated(since = "2.0.0", forRemoval = true)
     @PostMapping("/{forumId}/message")
     public ApiResult<ForumMessageInfoResult> sendMessage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                          @PathVariable
                                                          @Min(value = 1, message = "ForumId must be a positive number")
                                                          Long forumId,
                                                          @Valid @RequestBody MessageCreateRequest forumMessageCreateRequest) {
-        ForumMessageInfoResult result = forumMessageService.insert(userDetails.getUser().getId(),
-                forumId, forumMessageCreateRequest);
-        return ApiResult.success(result);
+        throw new BusinessException("The method is no longer supported");
     }
 
     @GetMapping("/{forumId}/messages")
