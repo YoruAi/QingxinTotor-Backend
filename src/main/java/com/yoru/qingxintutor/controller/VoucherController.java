@@ -20,7 +20,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/voucher")
 public class VoucherController {
-
     @Autowired
     private VoucherService voucherService;
 

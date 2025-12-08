@@ -27,46 +27,32 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class AuthService {
-
     @Autowired
     private UserMapper userMapper;
-
     @Autowired
     private UserService userService;
-
     @Autowired
     private UserEmailMapper emailMapper;
-
     @Autowired
     private UserGithubMapper githubMapper;
-
     @Autowired
     private TeacherMapper teacherMapper;
-
     @Autowired
     private TeacherSubjectMapper teacherSubjectMapper;
-
     @Autowired
     private SubjectMapper subjectMapper;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @Autowired
     private JwtUtils jwtUtils;
-
     @Autowired
     private EmailUtils emailUtils;
-
     @Autowired
     private VerificationCodeService verificationCodeService;
-
     @Autowired
     private NotificationService notificationService;
-
     @Autowired
     private WalletService walletService;
-
     @Autowired
     private AvatarService avatarService;
 

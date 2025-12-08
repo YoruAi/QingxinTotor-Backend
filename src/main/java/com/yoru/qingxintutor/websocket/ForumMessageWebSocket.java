@@ -25,13 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ServerEndpoint(value = "/ws/forum/{forumId}/message", configurator = SpringAwareConfigurator.class)
 public class ForumMessageWebSocket {
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private ForumMessageService forumMessageService;
-
     @Autowired
     private JwtUtils jwtUtils;
 

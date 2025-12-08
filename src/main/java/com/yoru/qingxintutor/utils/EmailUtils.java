@@ -18,13 +18,11 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 @Component
 public class EmailUtils {
-
     @Value("${spring.mail.username}")
     private String from;
 
     @Autowired
     private JavaMailSender javaMailSender;
-
     @Autowired
     private TemplateEngine templateEngine;
 

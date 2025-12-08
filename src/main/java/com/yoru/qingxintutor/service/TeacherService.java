@@ -21,13 +21,10 @@ import java.util.function.Supplier;
 
 @Service
 public class TeacherService {
-
     @Autowired
     private TeacherMapper teacherMapper;
-
     @Autowired
     private TeacherSubjectMapper teacherSubjectMapper;
-
     @Autowired
     private SubjectMapper subjectMapper;
 

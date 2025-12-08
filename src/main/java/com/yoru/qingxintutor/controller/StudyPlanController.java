@@ -21,7 +21,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/study-plan")
 public class StudyPlanController {
-
     @Autowired
     private StudyPlanService studyPlanService;
 

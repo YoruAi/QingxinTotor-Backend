@@ -31,7 +31,6 @@ import java.time.Duration;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
     @Value("${app.upload.file-dir}")
     private String fileDir;
 

@@ -24,13 +24,10 @@ import java.util.Optional;
 public class PrivateChatService {
     @Autowired
     private PrivateChatMapper chatMapper;
-
     @Autowired
     private PrivateMessageMapper messageMapper;
-
     @Autowired
     private UserMapper userMapper;
-
     @Autowired
     private TeacherMapper teacherMapper;
 

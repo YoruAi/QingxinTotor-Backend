@@ -13,10 +13,9 @@ import java.util.List;
 
 @Service
 public class FeedbackService {
-
     @Autowired
     private AppFeedbackMapper feedbackMapper;
-    
+
     public List<FeedbackInfoResult> listAllByUserId(String userId) {
         return feedbackMapper.findByUserId(userId)
                 .stream()

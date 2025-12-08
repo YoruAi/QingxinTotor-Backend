@@ -18,7 +18,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/insight")
 public class InsightController {
-
     @Autowired
     private AnalyticsService analyticsService;
 

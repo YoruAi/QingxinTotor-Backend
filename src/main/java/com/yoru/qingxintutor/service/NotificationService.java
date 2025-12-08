@@ -11,7 +11,6 @@ import java.util.List;
 
 @Service
 public class NotificationService {
-
     @Autowired
     private NotificationMapper notificationMapper;
 

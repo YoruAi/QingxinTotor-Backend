@@ -22,10 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/teacher")
 public class TeacherController {
-
     @Autowired
     private TeacherService teacherService;
-
     @Autowired
     private AvatarService avatarService;
 

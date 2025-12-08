@@ -13,7 +13,6 @@ import java.util.Date;
 
 @Component
 public class JwtUtils {
-
     @Autowired
     private JwtProperties jwtProperties;
 

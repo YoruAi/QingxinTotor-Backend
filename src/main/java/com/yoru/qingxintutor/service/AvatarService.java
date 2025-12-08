@@ -28,7 +28,6 @@ import java.util.concurrent.CompletableFuture;
 @Service
 public class AvatarService {
     public static final String DEFAULT_AVATAR_URL = "/avatar/default.jpg";
-    
     private static final String AVATAR_DIR = "avatar";
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png");
 

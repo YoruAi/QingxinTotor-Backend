@@ -18,10 +18,8 @@ import java.util.List;
 
 @Service
 public class WalletService {
-
     @Autowired
     private UserWalletMapper walletMapper;
-
     @Autowired
     private WalletRechargeOrderMapper rechargeOrderMapper;
 

@@ -24,14 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @ServerEndpoint(value = "/ws/private-chat/{chatId}/message", configurator = SpringAwareConfigurator.class)
 public class PrivateChatWebSocket {
-
-
     @Autowired
     private ObjectMapper objectMapper;
-
     @Autowired
     private PrivateChatService privateChatService;
-
     @Autowired
     private JwtUtils jwtUtils;
 

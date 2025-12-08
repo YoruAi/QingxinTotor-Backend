@@ -27,16 +27,13 @@ public class VerificationCodeService {
 
     @Autowired
     private EmailVerificationCodeMapper emailVerificationCodeMapper;
-
+    @Autowired
+    private UserEmailMapper emailMapper;
+    @Autowired
+    private EmailUtils emailUtils;
     @Lazy
     @Autowired
     private VerificationCodeService self;
-
-    @Autowired
-    private UserEmailMapper emailMapper;
-
-    @Autowired
-    private EmailUtils emailUtils;
 
     @Transactional
     public void attemptVerifyCode(String email, String inputCode) {

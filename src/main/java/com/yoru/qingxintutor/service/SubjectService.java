@@ -13,13 +13,10 @@ import java.util.Optional;
 
 @Service
 public class SubjectService {
-
     @Autowired
     private SubjectMapper subjectMapper;
-
     @Autowired
     private TeacherMapper teacherMapper;
-
     @Autowired
     private TeacherSubjectMapper teacherSubjectMapper;
 

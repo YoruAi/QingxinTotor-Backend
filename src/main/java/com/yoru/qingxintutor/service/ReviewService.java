@@ -19,19 +19,14 @@ import java.util.List;
 
 @Service
 public class ReviewService {
-
     @Autowired
     private TeacherReviewMapper reviewMapper;
-
     @Autowired
     private TeacherService teacherService;
-
     @Autowired
     private TeacherMapper teacherMapper;
-
     @Autowired
     private TeacherReviewMapper teacherReviewMapper;
-
     @Autowired
     private UserMapper userMapper;
 

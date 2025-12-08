@@ -15,13 +15,10 @@ import java.util.List;
 
 @Service
 public class ForumMessageService {
-
     @Autowired
     private ForumMessageMapper forumMessageMapper;
-
     @Autowired
     private ForumMapper forumMapper;
-
     @Autowired
     private UserMapper userMapper;
 

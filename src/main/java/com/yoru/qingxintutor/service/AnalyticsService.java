@@ -29,30 +29,22 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class AnalyticsService {
-
     @Autowired
     private NotificationService notificationService;
-
     @Autowired
     private ForumService forumService;
-
     @Autowired
     private ForumMessageService forumMessageService;
-
     @Autowired
     private StudyPlanService studyPlanService;
-
     @Autowired
     private ReservationService reservationService;
-
     @Autowired
     private TeacherMapper teacherMapper;
-
     @Autowired
     private TeacherReviewMapper reviewMapper;
-
+    
     private final String model;
-
     private final ArkService arkService;
 
     public AnalyticsService(@Value("${app.ai.api-key}") String apiKey,

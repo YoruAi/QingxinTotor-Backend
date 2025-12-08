@@ -24,7 +24,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/api/wallet")
 public class WalletController {
-
     @Autowired
     private WalletService walletService;
 

@@ -22,22 +22,16 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-
     @Autowired
     private UserMapper userMapper;
-
     @Autowired
     private UserEmailMapper emailMapper;
-
     @Autowired
     private UserGithubMapper githubMapper;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @Autowired
     private VerificationCodeService verificationCodeService;
-
     @Autowired
     private EmailUtils emailUtils;
 

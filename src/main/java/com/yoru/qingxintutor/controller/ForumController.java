@@ -20,10 +20,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/forum")
 public class ForumController {
-
     @Autowired
     private ForumMessageService forumMessageService;
-
     @Autowired
     private ForumService forumService;
 

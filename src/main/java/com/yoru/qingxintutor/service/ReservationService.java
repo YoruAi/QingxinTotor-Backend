@@ -21,37 +21,26 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class ReservationService {
-
     @Autowired
     private UserOrderMapper orderMapper;
-
     @Autowired
     private ReservationMapper reservationMapper;
-
     @Autowired
     private UserMapper userMapper;
-
     @Autowired
     private TeacherMapper teacherMapper;
-
     @Autowired
     private TeacherSubjectMapper teacherSubjectMapper;
-
     @Autowired
     private SubjectMapper subjectMapper;
-
     @Autowired
     private WalletService walletService;
-
     @Autowired
     private VoucherService voucherService;
-
     @Autowired
     private NotificationService notificationService;
-
     @Autowired
     private UserEmailMapper emailMapper;
-
     @Autowired
     private EmailUtils emailUtils;
 

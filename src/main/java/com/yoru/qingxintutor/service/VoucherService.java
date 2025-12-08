@@ -13,12 +13,10 @@ import java.util.List;
 
 @Service
 public class VoucherService {
-
     public static final int voucherExpireIn = 3;    // days
 
     @Autowired
     private UserVoucherMapper voucherMapper;
-
     @Autowired
     private WalletService walletService;
 
