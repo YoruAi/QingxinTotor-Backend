@@ -3,6 +3,8 @@ package com.yoru.qingxintutor.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yoru.qingxintutor.config.SpringAwareConfigurator;
+import com.yoru.qingxintutor.mapper.ForumMapper;
+import com.yoru.qingxintutor.mapper.UserMapper;
 import com.yoru.qingxintutor.pojo.dto.request.MessageCreateRequest;
 import com.yoru.qingxintutor.pojo.result.ForumMessageInfoResult;
 import com.yoru.qingxintutor.service.ForumMessageService;
@@ -30,6 +32,10 @@ public class ForumMessageWebSocket {
     @Autowired
     private ForumMessageService forumMessageService;
     @Autowired
+    private ForumMapper forumMapper;
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
     private JwtUtils jwtUtils;
 
     private static final String USER_ID = "userId";
@@ -37,26 +43,30 @@ public class ForumMessageWebSocket {
 
     @OnOpen
     public void onOpen(@PathParam("forumId") Long forumId, Session session, EndpointConfig config) {
-        HandshakeRequest request = (HandshakeRequest) config.getUserProperties().get("httpRequest");
-        if (request != null) {
-            List<String> authHeaders = request.getHeaders().get("Authorization");
-            String token = null;
-            if (authHeaders != null && !authHeaders.isEmpty()) {
-                String authHeader = authHeaders.get(0);
-                if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                    token = authHeader.substring(7);
+        try {
+            HandshakeRequest request = (HandshakeRequest) config.getUserProperties().get("httpRequest");
+            if (request != null) {
+                List<String> authHeaders = request.getHeaders().get("Authorization");
+                String token = null;
+                if (authHeaders != null && !authHeaders.isEmpty()) {
+                    String authHeader = authHeaders.get(0);
+                    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                        token = authHeader.substring(7);
+                    }
+                }
+
+                if (token != null && jwtUtils.validateToken(token)) {
+                    String userId = jwtUtils.getUserIdFromToken(token);
+                    if (userMapper.findById(userId).isPresent() && forumMapper.findById(forumId).isPresent()) {
+                        session.getUserProperties().put(USER_ID, userId);
+                        FORUM_SESSIONS.computeIfAbsent(forumId, k -> ConcurrentHashMap.newKeySet()).add(session);
+                        log.debug("User {} authenticated websocket for forum {}", userId, forumId);
+                        return;
+                    }
                 }
             }
-
-            if (token != null && jwtUtils.validateToken(token)) {
-                String userId = jwtUtils.getUserIdFromToken(token);
-                session.getUserProperties().put(USER_ID, userId);
-                FORUM_SESSIONS.computeIfAbsent(forumId, k -> ConcurrentHashMap.newKeySet()).add(session);
-                log.debug("User {} authenticated websocket for forum {}", userId, forumId);
-                return;
-            }
+        } catch (Exception ignored) {
         }
-
         // 认证失败，关闭连接
         try {
             session.close(new CloseReason(CloseReason.CloseCodes.CANNOT_ACCEPT, "Unauthorized"));
@@ -85,6 +95,7 @@ public class ForumMessageWebSocket {
         if (sessions != null) {
             sessions.remove(session);
             if (sessions.isEmpty()) FORUM_SESSIONS.remove(forumId);
+            log.debug("User {} disconnect websocket for forum {}", session.getUserProperties().get(USER_ID), forumId);
         }
     }
 
