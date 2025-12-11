@@ -12,7 +12,7 @@ BasePackageName: com.yoru.qingxintutor
 
 TechStack:
 
-- backend: Java SpringBoot, MyBatis, MySQL, Spring Security
+- backend: Java SpringBoot, MyBatis, MySQL, Spring Security, Redis
 
 **See frontend**: https://github.com/YoruAi/QingxinTutor-Frontend
 
@@ -84,7 +84,7 @@ unverified, there may be errors.
 
 ## 项目特点
 
-1. 完好健壮的安全机制。包括 JWT 令牌管理、身份权限管理、参数校验、操作合法性校验、验证码发送检查、全局异常处理机制等等，避免因接口暴露而导致产生脏数据、扰乱系统正常运行状态。
+1. 完好健壮的安全机制。包括 JWT 令牌管理、身份权限管理、参数校验、操作合法性校验、验证码发送检查、防重放机制、全局异常处理机制等等，避免因接口暴露而导致产生脏数据、扰乱系统正常运行状态。
 2. 贴近实际的模拟支付机制。使用H5支付页+`/callback`模式，一旦申请到真实支付接口，即可迅速应用，无需修改前端代码。
 3. 预约与订单管理功能。采用如下所示预约流程：
 
@@ -119,8 +119,8 @@ unverified, there may be errors.
 
 Completed. New features will be added occasionally.
 
-因作者经精力有限，还有很多可优化以及可拓展的地方，例如可引入Redis以进行验证码校验和防重放机制
-(本项目目前只使用了timestamp限制防重放)、加入管理员身份等。希望我的代码具备良好的可拓展性、可重构性和可读性，能帮助到各位开发者们。
+因作者经精力有限，还有很多可优化以及可拓展的地方，例如防重放机制并没有完全添加到所有需要防重放机制的接口上（其实只需要在接口上添加`@AntiReply`
+注解即可、加入管理员身份等。希望我的代码具备良好的可拓展性、可重构性和可读性，能帮助到各位开发者们。
 
 请勿照搬照抄，若有疑问请发表Discussions或提交Issue。欢迎各位开发者们批评指正。
 

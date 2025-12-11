@@ -1,5 +1,6 @@
 package com.yoru.qingxintutor.controller;
 
+import com.yoru.qingxintutor.annotation.AntiReplay;
 import com.yoru.qingxintutor.annotation.auth.RequireStudent;
 import com.yoru.qingxintutor.filter.CustomUserDetails;
 import com.yoru.qingxintutor.pojo.ApiResult;
@@ -58,6 +59,7 @@ public class WalletController {
     }
 
     // POST	/recharge	用户	发起充值请求（生成充值订单，跳转第三方h5支付）
+    @AntiReplay
     @RequireStudent
     @ResponseBody
     @PostMapping("/recharge")
