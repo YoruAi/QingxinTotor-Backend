@@ -38,6 +38,8 @@ public class UserRegisterRequest {
     // 禁止用户注册系统自动注册用户名前缀
     @AssertTrue(message = "The username cannot be registered")
     public boolean isUsernameValid() {
+        if (username == null)
+            return true;
         return !username.startsWith("github_") && !username.startsWith("email_");
     }
 }
